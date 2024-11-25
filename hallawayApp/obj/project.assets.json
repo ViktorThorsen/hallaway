@@ -8,24 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\vikto\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\celvi\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\vikto\\CSharpProjects\\hallaway\\hallawayApp\\hallawayApp.csproj",
+      "projectUniqueName": "C:\\Users\\celvi\\repos\\csharp\\hallaway\\hallawayApp\\hallawayApp.csproj",
       "projectName": "hallawayApp",
-      "projectPath": "C:\\Users\\vikto\\CSharpProjects\\hallaway\\hallawayApp\\hallawayApp.csproj",
-      "packagesPath": "C:\\Users\\vikto\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\vikto\\CSharpProjects\\hallaway\\hallawayApp\\obj\\",
+      "projectPath": "C:\\Users\\celvi\\repos\\csharp\\hallaway\\hallawayApp\\hallawayApp.csproj",
+      "packagesPath": "C:\\Users\\celvi\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\celvi\\repos\\csharp\\hallaway\\hallawayApp\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\vikto\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\celvi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -33,7 +28,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
