@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("hallawayApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2b5ce7f94b4cd31ee0e7aca4011735fd258d7c33")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+165c84a4cd983bb51ff83e872edd74044096166e")]
 [assembly: System.Reflection.AssemblyProductAttribute("hallawayApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("hallawayApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
