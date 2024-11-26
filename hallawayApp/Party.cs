@@ -2,7 +2,7 @@
 
 public class Party
 {
-    private Person _organizer;
-    private List<Person> _persons;
+    public Person _organizer;
+    public List<Person> _persons;
 
 }
