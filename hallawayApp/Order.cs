@@ -10,6 +10,13 @@ public class Order
     private double totalPrice;
     private List<Addon> addonList;
 
+    public Order(Party party, Admin admin)
+    {
+        this.party = party;
+        this.admin = admin;
+        
+    }
+
     private void AddHotel()
     {
         
