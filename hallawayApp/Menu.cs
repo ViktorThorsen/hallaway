@@ -16,7 +16,7 @@ public class Menu
         switch (input)
         {
             case 1:
-                // Add a party function
+                Party party = new Party();
                 break;
             case 2:
                 // Pick a date
