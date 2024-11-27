@@ -2,8 +2,8 @@
 namespace hallawayApp;
 public class Party
 {
-    private Person _organizer;
-    private List<Person> _persons = new List<Person>();
+    public Person organizer;
+    public List<Person> persons = new List<Person>();
     private Menu _paryMenu = new Menu();
 
     public Party()
@@ -18,7 +18,7 @@ public class Party
         string email = AddPersonEmailMenu();
         DateTime date = AddPersonDoBMenu();
         Person person = new Person(name, phone, email, date);
-        _persons.Add(person);
+        persons.Add(person);
         Console.WriteLine($"{name} was added to the party");
     }
 

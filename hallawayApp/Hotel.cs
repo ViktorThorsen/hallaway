@@ -2,18 +2,18 @@
 
 public class Hotel
 {
-    private string hotelName;
-    private Address address;
-    private bool pool;
-    private enum ratingEnum;
+    public string hotelName;
+    public Address address;
+    public bool pool;
+    public Rating rating;
 
-    private bool resturante;
-    private bool kidsClub;
-    private int distanceBeach;
-    private int distanceCityCenter;
-    private bool eveningEntertainment;
-    private List<Room> roomList;
-    private List<Addon> addonList;
+    public bool resturante;
+    public bool kidsClub;
+    public int distanceBeach;
+    public int distanceCityCenter;
+    public bool eveningEntertainment;
+    public List<Room> roomList;
+    public List<Addon> addonList;
 
     private void GetHotel()
     {

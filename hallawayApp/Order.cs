@@ -3,12 +3,12 @@
 public class Order
 {
     private string orderName;
-    private Party party;
-    private Admin admin;
-    private Hotel hotel;
-    private DateTime date;
-    private double totalPrice;
-    private List<Addon> addonList;
+    public Party party;
+    public Admin admin;
+    public Hotel hotel;
+    public DateTime date;
+    public double totalPrice;
+    public List<Addon> addonList;
 
     public Order(Party party, Admin admin)
     {
