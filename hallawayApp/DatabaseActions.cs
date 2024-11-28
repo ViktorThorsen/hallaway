@@ -1,3 +1,4 @@
+using System.Data;
 using Npgsql;
 
 namespace hallawayApp;
@@ -94,17 +95,48 @@ public class DatabaseActions
         return null;
     }
 
-    public void ShowAllPersons()
+    public async void AddParty(int organizer, Person persons)
+    {
+        await using (var cmd = _db.CreateCommand("INSERT INTO PARTY (organizer, persons) VALUES ($1, $2)"))
+        {
+            cmd.Parameters.AddWithValue(organizer); // organizer int
+            cmd.Parameters.AddWithValue(persons);
+            await cmd.ExecuteReaderAsync();
+        }
+    }
+
+    public async void AddPerson(List<Person> persons)
+    {
+        await using (var cmd = _db.CreateCommand(
+                         "INSERT INTO PERSON (name, phone, email, dateOfBirth) VALUES ($1, $2, $3, $4)"))
+        {
+            foreach (var person in persons)
+            {
+                cmd.Parameters.AddWithValue(person.name); // Adds name
+                cmd.Parameters.AddWithValue(person.phone);  // Adds phone
+                cmd.Parameters.AddWithValue(person.email); // Adds email
+                cmd.Parameters.AddWithValue(person.dateOfBirth); // Adds date of birth
+                await cmd.ExecuteReaderAsync();
+            }
+        }
+    }
+
+    public void AddOrder()
     {
         
     }
 
-    public void GetOneHotel()
+    public void AddHotel()
     {
         
     }
 
-    public void GetOnePerson()
+    public void AddRoom()
+    {
+        
+    }
+
+    public void AddAddon()
     {
         
     }
