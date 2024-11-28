@@ -64,33 +64,30 @@ public class DatabaseActions
     }
     
     // Method that reads all the hotels from the database and returns them as objects
-    public async Task<Hotel> GetHotel()
+    public async Task<Hotel> GetHotel(string hotelName)
     {
-        await using (var cmd = _db.CreateCommand("SELECT * FROM Hotel.Address WHERE id = $()"))
+        await using (var cmd = _db.CreateCommand($"SELECT * FROM Hotel WHERE hotel_name = {hotelName}"))
         {
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
-                while (await reader.ReadAsync())
+                if (await reader.ReadAsync())
                 {
-                    if (await reader.ReadAsync())
-                    {
-                        // Address
-                        int addressId = reader.GetInt32(2);
-                        Address address = await GetAddress(addressId);
+                    // Address
+                    int addressId = reader.GetInt32(2);
+                    Address address = await GetAddress(addressId);
 
-                        // Rooms
-                        var rooms = await GetRooms(reader.GetInt32(0));
+                    // Rooms
+                    var rooms = await GetRooms(reader.GetInt32(0));
 
-                        // Addons
-                        var addons = await GetAddons(reader.GetInt32(9));
+                    // Addons
+                    var addons = await GetAddons(reader.GetInt32(9));
 
-                        // Hotel constructor and add to list
-                        Hotel hotel = new Hotel(reader.GetString(1), address, reader.GetBoolean(3),
-                            reader.GetBoolean(4),
-                            reader.GetBoolean(5), reader.GetInt32(6), reader.GetInt32(7),
-                            reader.GetBoolean(8), rooms, addons);
-                        return hotel; 
-                    }
+                    // Hotel constructor and add to list
+                    Hotel hotel = new Hotel(reader.GetString(1), address, reader.GetBoolean(3),
+                        reader.GetBoolean(4),
+                        reader.GetBoolean(5), reader.GetInt32(6), reader.GetInt32(7),
+                        reader.GetBoolean(8), rooms, addons);
+                    return hotel; 
                 }
             }
         }
