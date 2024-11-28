@@ -18,13 +18,13 @@ public class Hotel
     public static List<Hotel> G;
 
     //Constructor Hotel
-    public Hotel(string hotelName, Address address, Enum ratingEnum, bool pool, bool restaurante, bool kidsClub,
+    public Hotel(string hotelName, Address address, bool pool, bool restaurante, bool kidsClub,
         int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList,
         List<Addon> addonList)
     {
         this.hotelName = hotelName;
         this.address = address;
-        this.ratingEnum = ratingEnum;
+        
         this.pool = pool;
         this.restaurante = restaurante;
         this.kidsClub = kidsClub;
