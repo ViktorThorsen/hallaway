@@ -2,6 +2,6 @@
 
 using hallawayApp;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Welcome! Add a party and Desitination to Create a order");
 Menu mainMenu = new Menu();
 mainMenu.CallMainMenu();
