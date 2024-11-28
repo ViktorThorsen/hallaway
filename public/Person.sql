@@ -8,8 +8,7 @@ create table "Person"
     email         varchar,
     date_of_birth date,
     party_id      integer
-        constraint person_party_id_fk
-            references "Party"
+
 );
 
 alter table "Person"
