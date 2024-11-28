@@ -4,7 +4,7 @@ namespace hallawayApp;
 
 public class Menu
 {
-    public void CallMainMenu()
+    public void CallMainMenu(DatabaseActions databaseActions)
     {
         Console.WriteLine($"===========================" +
                           $"Welcome to Hallaway!" +
@@ -19,10 +19,10 @@ public class Menu
                 Order order = new Order();
                 break;
             case 2:
-                //View all persons in Database
+                
                 break;
             case 3:
-                //View all hotels in Database
+                
                 break;
             case 0:
                 Console.WriteLine("Goodbye!"); // Quit!
