@@ -6,10 +6,11 @@ public class Menu
 {
     public void CallMainMenu()
     {
-        Console.WriteLine($"===========================" +
+        Console.Clear();
+        Console.WriteLine($"=========================== " +
                           $"Welcome to Hallaway!" +
-                          $"===========================" +
-                          $"\n1) Add a party \n2) Pick a date \n3) Select destination \n4) View details \n5) Done \n0) Quit");
+                          $" =========================== " +
+                          $"\n1) Add a party \n2) Pick a date \n3) Select destination \n4) View order details \n5) Done \n0) Quit");
         int input = Int32.Parse(Console.ReadLine());
         Debug.Assert(input != null);
 
