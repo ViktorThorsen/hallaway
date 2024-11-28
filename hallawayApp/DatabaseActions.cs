@@ -11,7 +11,7 @@ public class DatabaseActions
         _db = db;
     }
     
-    public void ShowAllHotels()
+    public async void ShowAllHotels()
     {
         await using (var cmd = _db.CreateCommand("SELECT * FROM Hotel"))
         await using (var reader = await cmd.ExecuteReaderAsync())
