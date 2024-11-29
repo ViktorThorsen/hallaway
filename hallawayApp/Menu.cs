@@ -4,7 +4,7 @@ namespace hallawayApp;
 
 public class Menu
 {
-    public void CallMainMenu(DatabaseActions databaseActions)
+    public void CallMainMenu()
     {
         Console.WriteLine($"===========================" +
                           $"Welcome to Hallaway!" +
