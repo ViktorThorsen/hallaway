@@ -17,7 +17,7 @@ public class Order
         
     }
     
-    public Order(Hotel)
+    
 
     private void AddHotel()
     {

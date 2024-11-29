@@ -23,7 +23,7 @@ public class Menu
                 break;
             case 3:
                 // Select destination
-                Hotel hotel = new Hotel();
+               
                 break;
             case 4:
                 // Order details
