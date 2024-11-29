@@ -2,8 +2,8 @@
 
 public class Admin
 {
-    private string name;
-    private string phone;
-    private string email;
-    private DateTime dateOfBirth;
+    public string name;
+    public string phone;
+    public string email;
+    public DateTime dateOfBirth;
 }
