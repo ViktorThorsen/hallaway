@@ -16,6 +16,8 @@ public class Order
         this.admin = admin;
         
     }
+    
+    public Order(Hotel)
 
     private void AddHotel()
     {

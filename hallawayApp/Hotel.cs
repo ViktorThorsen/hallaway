@@ -1,4 +1,6 @@
-﻿namespace hallawayApp;
+﻿using Npgsql;
+
+namespace hallawayApp;
 
 public class Hotel
 {
@@ -14,8 +16,10 @@ public class Hotel
     private bool eveningEntertainment;
     private List<Room> roomList;
     private List<Addon> addonList;
+
+  
+  
     
-    public static List<Hotel> G;
 
     //Constructor Hotel
     public Hotel(string hotelName, Address address, bool pool, bool restaurante, bool kidsClub,
@@ -34,20 +38,8 @@ public class Hotel
         this.roomList = roomList;
         this.addonList = addonList;
         
-        Console.Clear();
-        SelectDestinationMenu();
-    }
-    
-
-    private void SelectDestinationMenu()
-    {
        
-        
     }
     
     
-    private void GetHotel()
-    {
-        
-    }
 }
