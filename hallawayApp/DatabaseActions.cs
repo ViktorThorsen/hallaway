@@ -95,12 +95,12 @@ public class DatabaseActions
         return null;
     }
 
-    public async void AddParty(int organizer, Person persons)
+    public async void AddParty(Person organizer)
     {
+        int organizer_id = await GetPersonId(organizer.name);
         await using (var cmd = _db.CreateCommand("INSERT INTO PARTY (organizer, persons) VALUES ($1, $2)"))
         {
             cmd.Parameters.AddWithValue(organizer); // organizer int
-            cmd.Parameters.AddWithValue(persons);
             await cmd.ExecuteReaderAsync();
         }
     }
@@ -125,19 +125,74 @@ public class DatabaseActions
     {
         
     }
-
-    public void AddHotel()
+    
+    //add new Hotel to DB
+    public async void AddHotel(string name, Address address, bool pool, bool resturant, bool kidsClub, Rating rating, int distanceBeach, int distanceCityCenter, bool evningEntertainment)
     {
-        
+        int address_id = await GetAddressId(address.City, address.Street);
+        await using (var cmd = _db.CreateCommand(
+                         "INSERT INTO Hotel (hotel_name, address, pool, resturant, kidsclub, rating, distancebeach, distancecitycenter, evningentertainment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"))
+        {
+            cmd.Parameters.AddWithValue(name);
+            cmd.Parameters.AddWithValue(address_id);
+            cmd.Parameters.AddWithValue(pool);
+            cmd.Parameters.AddWithValue(resturant);
+            cmd.Parameters.AddWithValue(kidsClub);
+            cmd.Parameters.AddWithValue(rating);
+            cmd.Parameters.AddWithValue(distanceBeach);
+            cmd.Parameters.AddWithValue(distanceCityCenter);
+            cmd.Parameters.AddWithValue(evningEntertainment);
+                
+        }
+    }
+    //add new Room to DB
+    public async void AddRoom(double price, int size, bool avalible)
+    {
+        await using (var cmd = _db.CreateCommand(" INSERT INTO Room (price, size, isAvalible) VALUES ($1, $2, $3)"))
+        {
+            cmd.Parameters.AddWithValue(price);
+            cmd.Parameters.AddWithValue(size);
+            cmd.Parameters.AddWithValue(avalible);
+            await cmd.ExecuteReaderAsync();
+        }
     }
 
-    public void AddRoom()
+    // Add new AddOn to DB, missing order_id
+    public async void AddAddon(string name, string description, double price, Hotel hotel)
     {
-        
+        int hotel_id = (GetHotel(hotel.hotelName).Id);
+        await using (var cmd = _db.CreateCommand(
+                         "INSERT INTO AddON (name, description, price, hotel,) VALUES ($1, $2, $3, $4)"))
+        {
+            cmd.Parameters.AddWithValue(name);
+            cmd.Parameters.AddWithValue(description);
+            cmd.Parameters.AddWithValue(price);
+            cmd.Parameters.AddWithValue(hotel_id);
+            await cmd.ExecuteReaderAsync();
+        }
     }
 
-    public void AddAddon()
+    public async Task<int> GetAddressId(string city, string street)
     {
-        
+        int address_id;
+        await using(var cmd = _db.CreateCommand($"SELECT location_id FROM Address WHERE city = {city} AND wHERE street = {street}"))
+        await using(var reader = await cmd.ExecuteReaderAsync())
+        {
+            address_id = reader.GetInt32(0);
+        }
+           
+        return address_id;
     }
+    
+    public async Task<int> GetPersonId(string name)
+        {
+            int person_id;
+            await using(var cmd = _db.CreateCommand($"SELECT user_id FROM Person WHERE name = {name}"))
+            await using(var reader = await cmd.ExecuteReaderAsync())
+            {
+                person_id = reader.GetInt32(0);
+            }
+               
+            return person_id;
+        }
 }
