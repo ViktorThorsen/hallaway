@@ -11,6 +11,7 @@ public class Database
     private readonly string _username = "";
     private readonly string _password = "";
     private readonly string _database = "";
+    private readonly string _schema = "";
 
     private NpgsqlDataSource _connection;
 
@@ -21,7 +22,7 @@ public class Database
 
     public Database()
     {
-        _connection = NpgsqlDataSource.Create($"Host={_host};Port={{_port}};Username={{_username}};Password={{_password}};Database={{_database}}");
+        _connection = NpgsqlDataSource.Create($"Host={_host};Port={{_port}};Username={{_username}};Password={{_password}};Database={{_database}}; Schema={{_schema}};");
         
         using var conn = _connection.OpenConnection(); // Checks if the connection is successful 
     }
