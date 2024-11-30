@@ -19,10 +19,10 @@ public class Menu
                 Order order = new Order();
                 break;
             case 2:
-                //View all persons in Database
+                
                 break;
             case 3:
-                //View all hotels in Database
+                
                 break;
             case 0:
                 Console.WriteLine("Goodbye!"); // Quit!

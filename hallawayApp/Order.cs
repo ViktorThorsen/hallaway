@@ -41,7 +41,7 @@ public class Order
                 // Pick a date
                 break;
             case 3:
-                // Select destination
+                
                 break;
             case 4:
                 ShowOrderDetails();
