@@ -33,7 +33,6 @@ create table if not exists "person"
     phone         varchar,
     email         varchar,
     date_of_birth date,
-    party_id      integer
 );
 
 alter table "person"
