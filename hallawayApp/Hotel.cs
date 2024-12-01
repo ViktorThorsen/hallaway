@@ -2,7 +2,7 @@
 
 public class Hotel
 {
-    private string hotelName;
+    public string hotelName;
     private Address address;
     private bool pool;
     private enum ratingEnum;
