@@ -138,6 +138,103 @@ public class DatabaseActions
             throw;
         }
     }
+    public async Task RemoveAllPersonsFromParty(int partyId)
+    {
+        try
+        {
+            // Delete all entries from person_X_party where the party_id matches
+            await using (var cmd = _db.CreateCommand(
+                             "DELETE FROM public.\"person_X_party\" WHERE \"party_id\" = @partyId"))
+            {
+                cmd.Parameters.AddWithValue("partyId", partyId);
+
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Successfully removed {rowsAffected} persons linked to Party ID {partyId}.");
+                }
+                else
+                {
+                    Console.WriteLine($"No persons were linked to Party ID {partyId}.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error removing persons from party: {ex.Message}");
+            throw;
+        }
+    }
+    
+    public async Task RemovePersonFromParty(int userId, int partyId)
+    {
+        try
+        {
+            // Delete the entry from person_X_party where the user_id and party_id match
+            await using (var cmd = _db.CreateCommand(
+                             "DELETE FROM public.\"person_X_party\" WHERE \"person_id\" = @userId AND \"party_id\" = @partyId"))
+            {
+                // Add parameters for the user_id and party_id
+                cmd.Parameters.AddWithValue("userId", userId);
+                cmd.Parameters.AddWithValue("partyId", partyId);
+
+                // Execute the query
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Successfully removed user ID {userId} from Party ID {partyId}.");
+                }
+                else
+                {
+                    Console.WriteLine($"No connection found between user ID {userId} and Party ID {partyId}.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error removing user ID {userId} from Party ID {partyId}: {ex.Message}");
+            throw;
+        }
+    }
+    
+    public async Task<List<(int UserId, string Name)>> GetPartyMembers(int partyId)
+    {
+        var partyMembers = new List<(int UserId, string Name)>();
+
+        try
+        {
+            await using (var cmd = _db.CreateCommand(
+                             "SELECT p.\"user_id\", p.\"name\" " +
+                             "FROM public.\"person\" p " +
+                             "INNER JOIN public.\"person_X_party\" pxp ON p.\"user_id\" = pxp.\"person_id\" " +
+                             "WHERE pxp.\"party_id\" = @partyId"))
+            {
+                // Add parameter for party ID
+                cmd.Parameters.AddWithValue("partyId", partyId);
+
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        // Get user_id and name from the query result
+                        int userId = reader.GetInt32(reader.GetOrdinal("user_id"));
+                        string name = reader.GetString(reader.GetOrdinal("name"));
+
+                        // Add the user_id and name to the list
+                        partyMembers.Add((userId, name));
+                    }
+                }
+            }
+
+            Console.WriteLine($"{partyMembers.Count} members found in Party ID {partyId}.");
+            return partyMembers;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving party members: {ex.Message}");
+            throw;
+        }
+    }
     
     public async Task UpdatePartyOrganizer(int partyId, int organizerId)
     {
@@ -289,14 +386,33 @@ public class DatabaseActions
     
     public async Task<int> GetPersonId(string name)
     {
-        int person_id;
-        await using(var cmd = _db.CreateCommand($"SELECT user_id FROM person WHERE name = {name}"))
-        await using(var reader = await cmd.ExecuteReaderAsync())
+        try
         {
-            person_id = reader.GetInt32(0);
+            await using (var cmd = _db.CreateCommand("SELECT \"user_id\" FROM public.\"person\" WHERE \"name\" = @name"))
+            {
+                // Safely add the name parameter
+                cmd.Parameters.AddWithValue("name", name);
+
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync()) // Check if a row is available
+                    {
+                        // Get the user_id from the first column
+                        return reader.GetInt32(0);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No person found with the name: {name}");
+                        return -1; // Or throw an exception, depending on your use case
+                    }
+                }
+            }
         }
-               
-        return person_id;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving user_id for name '{name}': {ex.Message}");
+            throw;
+        }
     }
 
     

@@ -36,8 +36,15 @@ public class Party
         string phone = AddPersonNumberMenu();
         string email = AddPersonEmailMenu();
         DateTime date = AddPersonDoBMenu();
-        
+        List<Person> personsInDatabase = await _databaseActions.GetAllPersons();
         Person person = new Person(name, phone, email, date);
+        if (PersonExists(person, personsInDatabase))
+        {
+            Console.WriteLine($"A person with the same details already exists in the database.");
+            return; // Exit without adding the person
+        }
+        
+        
         _persons.Add(person);
         int id = await _databaseActions.AddPersonToDataBase(person, partyID);
         if (_organizer == null)
@@ -48,6 +55,20 @@ public class Party
         
         Console.WriteLine($"{name} was added to the party");
         //Add This to Database
+    }
+    private bool PersonExists(Person newPerson, List<Person> personsInDatabase)
+    {
+        foreach (var person in personsInDatabase)
+        {
+            if (person.name == newPerson.name &&
+                person.phone == newPerson.phone &&
+                person.email == newPerson.email &&
+                person.dateOfBirth == newPerson.dateOfBirth)
+            {
+                return true; // The person already exists
+            }
+        }
+        return false; // No matching person found
     }
 
     private void DisplayAllPersons()
@@ -109,6 +130,11 @@ public class Party
         Person selectedPerson = personsInDataBase[choice - 1];
 
         Console.WriteLine($"You selected: {selectedPerson.name}");
+        if (PersonExists(selectedPerson, _persons))
+        {
+            Console.WriteLine($"A person with the same details already exists in the party.");
+            return; // Exit without adding the person
+        }
         _persons.Add(selectedPerson); // Add the selected person to the party list
 
         // Link the selected person to the current party in the PersonXParty table
@@ -143,7 +169,7 @@ public class Party
         }
     }
     
-    private void DeletePerson()
+    private async Task DeletePerson()
     {
         int selectedIndex = SelectPersonMenu();
 
@@ -159,6 +185,8 @@ public class Party
 
         if (confirmation?.ToLower() == "yes")
         {
+            int personID = await _databaseActions.GetPersonId(_persons[selectedIndex].name);
+            await _databaseActions.RemovePersonFromParty(personID, partyID);
             _persons.RemoveAt(selectedIndex);
             Console.WriteLine("Person successfully deleted.");
         }
@@ -203,6 +231,7 @@ public class Party
                     break;
                 case 0:
                     Console.WriteLine("Goodbye!");
+                    await _databaseActions.RemoveAllPersonsFromParty(partyID);
                     running = false; // Exit the menu loop
                     break;
                 default:
