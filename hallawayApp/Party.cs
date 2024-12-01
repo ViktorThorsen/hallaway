@@ -63,57 +63,68 @@ public class Party
         }
     }
 
-    private async Task DisplayAndSelectPersonFromDatabase()
+    private async Task DisplayAndSelectPersonFromDatabase(int partyID)
+{
+    List<Person> personsInDataBase = await _databaseActions.GetAllPersons();
+
+    if (personsInDataBase.Count == 0)
     {
-        List<Person> personsInDataBase = await _databaseActions.GetAllPersons();
-
-        if (personsInDataBase.Count == 0)
-        {
-            Console.WriteLine("No persons found in the database.");
-            return; // Exit if there are no persons
-        }
-
-        Console.WriteLine("===========================\nSelect a Person:");
-        for (int i = 0; i < personsInDataBase.Count; i++)
-        {
-            Console.WriteLine($"{i + 1}) {personsInDataBase[i].name}");
-        }
-
-        Console.WriteLine("0) Cancel");
-
-        bool isValid = false;
-
-        while (!isValid)
-        {
-            Console.Write("\nEnter your choice: ");
-            string input = Console.ReadLine();
-
-            if (!int.TryParse(input, out int choice))
-            {
-                Console.WriteLine("Invalid input. Please enter a valid number.");
-                continue;
-            }
-
-            if (choice == 0)
-            {
-                Console.WriteLine("Selection canceled.");
-                return; // Exit function on cancel
-            }
-
-            if (choice < 1 || choice > personsInDataBase.Count)
-            {
-                Console.WriteLine($"Invalid choice. Please select a number between 1 and {personsInDataBase.Count}, or 0 to cancel.");
-                continue;
-            }
-
-            // Valid choice, map to the correct person
-            Person selectedPerson = personsInDataBase[choice - 1];
-            Console.WriteLine($"You selected: {selectedPerson.name}");
-            _persons.Add(selectedPerson); // Add the selected person to the party list
-
-            isValid = true; // Exit the loop after a valid choice
-        }
+        Console.WriteLine("No persons found in the database.");
+        return; // Exit if there are no persons
     }
+
+    Console.WriteLine("===========================\nSelect a Person:");
+    for (int i = 0; i < personsInDataBase.Count; i++)
+    {
+        Console.WriteLine($"{i + 1}) {personsInDataBase[i].name}");
+    }
+
+    Console.WriteLine("0) Cancel");
+
+    while (true)
+    {
+        Console.Write("\nEnter your choice: ");
+        string input = Console.ReadLine();
+
+        if (!int.TryParse(input, out int choice))
+        {
+            Console.WriteLine("Invalid input. Please enter a valid number.");
+            continue;
+        }
+
+        if (choice == 0)
+        {
+            Console.WriteLine("Selection canceled.");
+            return; // Exit function on cancel
+        }
+
+        if (choice < 1 || choice > personsInDataBase.Count)
+        {
+            Console.WriteLine($"Invalid choice. Please select a number between 1 and {personsInDataBase.Count}, or 0 to cancel.");
+            continue;
+        }
+
+        // Calculate the corresponding user_id
+        int userId = choice; // Since the list is ordered by user_id and 1-based indexing is used
+        Person selectedPerson = personsInDataBase[choice - 1];
+
+        Console.WriteLine($"You selected: {selectedPerson.name}");
+        _persons.Add(selectedPerson); // Add the selected person to the party list
+
+        // Link the selected person to the current party in the PersonXParty table
+        try
+        {
+            await _databaseActions.AddPersonXParty(userId, partyID);
+            Console.WriteLine($"Person {selectedPerson.name} (ID: {userId}) successfully linked to Party {partyID}.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error linking person to party: {ex.Message}");
+        }
+
+        break; // Exit the loop after a valid choice
+    }
+}
 
     private int SelectPersonMenu()
     {
@@ -181,7 +192,7 @@ public class Party
                     await AddPerson();
                     break;
                 case 2:
-                   await DisplayAndSelectPersonFromDatabase();
+                   await DisplayAndSelectPersonFromDatabase(partyID);
                     break;
                 case 3:
                     DeletePerson();

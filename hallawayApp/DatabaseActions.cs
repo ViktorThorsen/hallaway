@@ -172,6 +172,30 @@ public class DatabaseActions
             throw;
         }
     }
+    public async Task AddPersonXParty(int personId, int partyId)
+    {
+        try
+        {
+            await using (var cmd = _db.CreateCommand(
+                             "INSERT INTO public.\"personxparty\" (\"person_id\", \"party_id\") " +
+                             "VALUES (@personId, @partyId)"))
+            {
+                // Add parameters
+                cmd.Parameters.AddWithValue("personId", personId);
+                cmd.Parameters.AddWithValue("partyId", partyId);
+
+                // Execute the query
+                await cmd.ExecuteNonQueryAsync();
+
+                Console.WriteLine($"Person ID {personId} successfully linked to Party ID {partyId}.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error linking person ID {personId} to party ID {partyId}: {ex.Message}");
+            throw;
+        }
+    }
 
     public async Task<int> AddPersonToDataBase(Person person, int partyId)
 {
@@ -231,7 +255,9 @@ public class DatabaseActions
 
         try
         {
-            await using (var cmd = _db.CreateCommand("SELECT \"user_id\", \"name\", \"phone\", \"email\", \"date_of_birth\", \"party_id\" FROM public.\"Person\""))
+            await using (var cmd = _db.CreateCommand(
+                             "SELECT \"user_id\", \"name\", \"phone\", \"email\", \"date_of_birth\"" +
+                             "FROM public.\"Person\" ORDER BY \"user_id\""))
             {
                 await using (var reader = await cmd.ExecuteReaderAsync())
                 {
