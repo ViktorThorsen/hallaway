@@ -6,7 +6,7 @@ public class Address
     public string Street;
     public string City;
  
-    public Address(string street, string city)
+    public Address(string city, string street)
  
     {
         Street = street;

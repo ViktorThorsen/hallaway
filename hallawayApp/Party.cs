@@ -2,18 +2,50 @@
 namespace hallawayApp;
 public class Party
 {
+    private int partyID;
     private Person _organizer;
     public List<Person> _persons = new List<Person>();
     private Menu _paryMenu = new Menu();
-    
-    private void AddPerson()
+    private DatabaseActions _databaseActions;
+
+    public Party(DatabaseActions databaseActions)
     {
-        string name = AddPersonNameMenu();
+        _databaseActions = databaseActions;
+        partyID = CreateEmptyParty();
+    }
+    
+    private int CreateEmptyParty()
+    {
+        int id = Task.Run(async () => await _databaseActions.AddEmptyParty()).Result;
+        Console.WriteLine($"Empty party created with Party ID: {id}");
+        return id;
+    }
+    
+    private async Task AddPerson()
+    {
+        string message = "";
+        if (_organizer == null)
+        {
+            message = "the Organizer of the party";
+        }
+        else
+        {
+            message = "a person the the party";
+        }
+        string name = AddPersonNameMenu(message);
         string phone = AddPersonNumberMenu();
         string email = AddPersonEmailMenu();
         DateTime date = AddPersonDoBMenu();
+        
         Person person = new Person(name, phone, email, date);
         _persons.Add(person);
+        int id = await _databaseActions.AddPersonToDataBase(person, partyID);
+        if (_organizer == null)
+        {
+            _organizer = person;
+            await _databaseActions.UpdatePartyOrganizer(partyID, id);
+        }
+        
         Console.WriteLine($"{name} was added to the party");
         //Add This to Database
     }
@@ -30,7 +62,59 @@ public class Party
             Console.WriteLine($"{i + 1}. Name: {person.name}, Email: {person.email}, DateOfBirth: {person.dateOfBirth.ToShortDateString()}");
         }
     }
-    
+
+    private async Task DisplayAndSelectPersonFromDatabase()
+    {
+        List<Person> personsInDataBase = await _databaseActions.GetAllPersons();
+
+        if (personsInDataBase.Count == 0)
+        {
+            Console.WriteLine("No persons found in the database.");
+            return; // Exit if there are no persons
+        }
+
+        Console.WriteLine("===========================\nSelect a Person:");
+        for (int i = 0; i < personsInDataBase.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}) {personsInDataBase[i].name}");
+        }
+
+        Console.WriteLine("0) Cancel");
+
+        bool isValid = false;
+
+        while (!isValid)
+        {
+            Console.Write("\nEnter your choice: ");
+            string input = Console.ReadLine();
+
+            if (!int.TryParse(input, out int choice))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+                continue;
+            }
+
+            if (choice == 0)
+            {
+                Console.WriteLine("Selection canceled.");
+                return; // Exit function on cancel
+            }
+
+            if (choice < 1 || choice > personsInDataBase.Count)
+            {
+                Console.WriteLine($"Invalid choice. Please select a number between 1 and {personsInDataBase.Count}, or 0 to cancel.");
+                continue;
+            }
+
+            // Valid choice, map to the correct person
+            Person selectedPerson = personsInDataBase[choice - 1];
+            Console.WriteLine($"You selected: {selectedPerson.name}");
+            _persons.Add(selectedPerson); // Add the selected person to the party list
+
+            isValid = true; // Exit the loop after a valid choice
+        }
+    }
+
     private int SelectPersonMenu()
     {
         DisplayAllPersons();
@@ -73,10 +157,9 @@ public class Party
         }
     }
 
-    public void AddPartyMenu()
+    public async Task PartyMenu()
     {
         bool running = true;
-
         while (running)
         {
             Console.WriteLine($"===========================" +
@@ -95,10 +178,10 @@ public class Party
             switch (choice)
             {
                 case 1:
-                    AddPerson();
+                    await AddPerson();
                     break;
                 case 2:
-                   //Add From database
+                   await DisplayAndSelectPersonFromDatabase();
                     break;
                 case 3:
                     DeletePerson();
@@ -118,10 +201,11 @@ public class Party
         }
     }
 
-    public string AddPersonNameMenu()
+    public string AddPersonNameMenu(string message)
     {
+        
         Console.WriteLine($"===========================" +
-                          $"Add Person: " +                   
+                          $"Add {message}: " +                   
                           $"===========================" +               
                           $"\nEnter person name: ");   
         string input = Console.ReadLine();    

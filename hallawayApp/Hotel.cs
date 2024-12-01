@@ -3,14 +3,14 @@
 public class Hotel
 {
     public string hotelName;
-    private Address address;
+    public Address address;
     private bool pool;
     private enum ratingEnum;
 
-    private bool restaurante;
-    private bool kidsClub;
+    public bool restaurante;
+    public bool kidsClub;
     private int distanceBeach;
-    private int distanceCityCenter;
+    public int distanceCityCenter;
     private bool eveningEntertainment;
     private List<Room> roomList;
     private List<Addon> addonList;
@@ -19,8 +19,7 @@ public class Hotel
 
     //Constructor Hotel
     public Hotel(string hotelName, Address address, bool pool, bool restaurante, bool kidsClub,
-        int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList,
-        List<Addon> addonList)
+        int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList)
     {
         this.hotelName = hotelName;
         this.address = address;

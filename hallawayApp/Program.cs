@@ -4,5 +4,6 @@ using hallawayApp;
 
 Console.WriteLine("Welcome! Add a party and Desitination to Create a order");
 Menu mainMenu = new Menu();
-
-mainMenu.CallMainMenu();
+Database database = new Database();
+DatabaseActions databaseActions = new DatabaseActions(database.Connection());
+await mainMenu.CallMainMenu(databaseActions);

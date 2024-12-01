@@ -3,20 +3,22 @@ using System.Diagnostics;
 public class Order
 {
     private string orderName;
-    private Party party = new Party();
+    private Party party;
     private Admin admin;
     private Hotel hotel;
     private DateTime date;
     private double totalPrice;
     private List<Addon> addonList;
+    private DatabaseActions _databaseActions;
 
-    public Order()
+    public Order(DatabaseActions databaseActions)
     {
-        CallCreateOrder();
+        _databaseActions = databaseActions;
     }
 
-    public void CallCreateOrder()
+    public async Task CreateOrder()
     {
+        party = new Party(_databaseActions);
         bool running = true;
 
         while (running){
@@ -35,7 +37,7 @@ public class Order
         switch (input)
         {
             case 1:
-                party.AddPartyMenu();
+                await party.PartyMenu();
                 break;
             case 2:
                 // Pick a date
