@@ -2,6 +2,7 @@
 
 public class Hotel
 {
+    public int hotelID;
     public string hotelName;
     public Address address;
     private bool pool;
@@ -18,9 +19,10 @@ public class Hotel
     public static List<Hotel> G;
 
     //Constructor Hotel
-    public Hotel(string hotelName, Address address, bool pool, bool restaurante, bool kidsClub,
+    public Hotel(int hotelId, string hotelName, Address address, bool pool, bool restaurante, bool kidsClub,
         int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList)
     {
+        this.hotelID = hotelId;
         this.hotelName = hotelName;
         this.address = address;
         
