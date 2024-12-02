@@ -94,7 +94,6 @@ public class DatabaseActions
                     // Extract column values
                     int addressId = reader.GetInt32(2); // Address ID
                     Address address = await GetAddress(addressId);
-
                     var rooms = await GetRooms(reader.GetInt32(0)); // Use hotel_id for room lookup
 
                     // Construct the Hotel object
@@ -103,6 +102,7 @@ public class DatabaseActions
                         reader.GetString(1),  // hotel_name
                         address,              // Address object
                         reader.GetBoolean(3), // pool
+                        reader.GetInt32(4),
                         reader.GetBoolean(4), // restaurant
                         reader.GetBoolean(5), // kidsClub
                         reader.GetInt32(7),   // number_of_rooms
@@ -379,5 +379,30 @@ public class DatabaseActions
            
         return address_id;
     }
-    
+    public async Task<List<string>> GetCities()
+    {
+        var cities = new List<string>();
+
+        try
+        {
+            await using (var cmd = _db.CreateCommand(
+                             $"SELECT DISTINCT \"city\" FROM public.\"address\""))
+            {
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        string city = reader.GetString(0);
+                        cities.Add(city);
+                    }
+                }
+            }
+            return cities;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving cities: {ex.Message}");
+            throw;
+        }
+    }
 }

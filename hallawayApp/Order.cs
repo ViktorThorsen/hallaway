@@ -1,4 +1,6 @@
-﻿namespace hallawayApp;
+﻿using System.Data;
+
+namespace hallawayApp;
 using System.Diagnostics;
 public class Order
 {
@@ -43,7 +45,8 @@ public class Order
                 // Pick a date
                 break;
             case 3:
-                
+                Console.Clear();
+                DestinationMenu();
                 break;
             case 4:
                 ShowOrderDetails();
@@ -98,4 +101,36 @@ public class Order
         }
         Console.WriteLine();
     }
+    private void DestinationMenu()
+    {
+        Console.WriteLine(
+            $"===========================" + 
+            $"===========================" + 
+            $"\n1) View cities" +
+            $"\n2) Search Hotel" +
+            $"\n0) Cancel");
+        int input = Int32.Parse(Console.ReadLine());
+
+        switch (input)
+        {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 0:
+                break;
+        }
+    }
+
+    private async void ListCities()
+    {
+        List<string> cities = await _databaseActions.GetCities();
+        for (int i = 0; i < cities.Count(); i++)
+        {
+            Console.WriteLine($"{i}) {cities[i]}");
+        }
+    }
+
 }
