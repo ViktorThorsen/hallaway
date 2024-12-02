@@ -82,7 +82,8 @@ public class DatabaseActions
     public async Task<Hotel> GetHotel(string hotelName)
     {
         // Use a parameterized query to avoid SQL injection
-        await using (var cmd = _db.CreateCommand("SELECT * FROM public.\"Hotel\" WHERE \"hotel_name\" = @hotelName"))
+        await using (var cmd = _db.CreateCommand($"SELECT * FROM public.\"Hotel\" WHERE \"hotel_name\" = @hotelName"))
+
         {
             cmd.Parameters.AddWithValue("hotelName", hotelName); // Pass the hotel name safely
 
@@ -290,7 +291,7 @@ public class DatabaseActions
     public async Task<int> GetPersonId(string name)
     {
         int person_id;
-        await using(var cmd = _db.CreateCommand($"SELECT user_id FROM Person WHERE name = {name}"))
+        await using(var cmd = _db.CreateCommand($"SELECT \"user_id\" FROM \"Person\" WHERE \"name\" = {name}"))
         await using(var reader = await cmd.ExecuteReaderAsync())
         {
             person_id = reader.GetInt32(0);
@@ -326,7 +327,7 @@ public class DatabaseActions
     {
         int address_id = await GetAddressId(address.City, address.Street);
         await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO Hotel (hotel_name, address, pool, resturant, kidsclub, rating, distancebeach, distancecitycenter, evningentertainment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"))
+                         "INSERT INTO public.\"Hotel\" (\"hotel_name\", \"address\", \"pool\", \"resturant\", \"kidsclub\", \"rating\", \"distancebeach\", \"distancecitycenter\", \"evningentertainment\") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"))
         {
             cmd.Parameters.AddWithValue(name);
             cmd.Parameters.AddWithValue(address_id);
@@ -343,7 +344,7 @@ public class DatabaseActions
     //add new Room to DB
     public async void AddRoom(double price, int size, bool avalible)
     {
-        await using (var cmd = _db.CreateCommand(" INSERT INTO Room (price, size, isAvalible) VALUES ($1, $2, $3)"))
+        await using (var cmd = _db.CreateCommand(" INSERT INTO \"Room\" (\"price\", \"size\", \"isAvalible\") VALUES ($1, $2, $3)"))
         {
             cmd.Parameters.AddWithValue(price);
             cmd.Parameters.AddWithValue(size);
@@ -357,7 +358,7 @@ public class DatabaseActions
     {
         int hotel_id = (GetHotel(hotel.hotelName).Id);
         await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO AddON (name, description, price, hotel,) VALUES ($1, $2, $3, $4)"))
+                         "INSERT INTO \"AddOn\" (\"name\", \"description\", \"price\", \"hotel\") VALUES ($1, $2, $3, $4)"))
         {
             cmd.Parameters.AddWithValue(name);
             cmd.Parameters.AddWithValue(description);
@@ -370,7 +371,7 @@ public class DatabaseActions
     public async Task<int> GetAddressId(string city, string street)
     {
         int address_id;
-        await using(var cmd = _db.CreateCommand($"SELECT location_id FROM Address WHERE city = {city} AND wHERE street = {street}"))
+        await using(var cmd = _db.CreateCommand($"SELECT \"location_id\" FROM \"Address\" WHERE \"city\" = {city} AND wHERE street = {street}"))
         await using(var reader = await cmd.ExecuteReaderAsync())
         {
             address_id = reader.GetInt32(0);
