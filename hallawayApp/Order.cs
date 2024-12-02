@@ -21,16 +21,18 @@ public class Order
         party = new Party(_databaseActions);
         bool running = true;
 
-        while (running){
+        while (running){ 
+            Console.Clear();
         Console.WriteLine(
-                          $"===========================" +
-                          $"===========================" + 
+                          $"Menu> OrderMenu" +
+                          $"\n---------------------------" + 
                           $"\n1) Manage party " +
                           $"\n2) Set date " +
                           $"\n3) Select destination " +
                           $"\n4) View details " +
                           $"\n5) Done " +
                           $"\n0) Quit");
+        Console.WriteLine("\nEnter your choice: ");
         int input = Int32.Parse(Console.ReadLine());
         Debug.Assert(input != null);
 
@@ -71,6 +73,7 @@ public class Order
         Console.WriteLine($"Destination: ");
     }
     //  Method that produces a list of hotels
+    /*
     public void ShowAllHotels()
     {
         // Get list of hotels from the database
@@ -97,5 +100,5 @@ public class Order
             }
         }
         Console.WriteLine();
-    }
+    }*/
 }

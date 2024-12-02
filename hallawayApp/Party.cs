@@ -26,16 +26,16 @@ public class Party
         string message = "";
         if (_organizer == null)
         {
-            message = "the Organizer of the party";
+            message = "PartyOrganizer";
         }
         else
         {
-            message = "a person the the party";
+            message = "PartyMember";
         }
         string name = AddPersonNameMenu(message);
-        string phone = AddPersonNumberMenu();
-        string email = AddPersonEmailMenu();
-        DateTime date = AddPersonDoBMenu();
+        string phone = AddPersonNumberMenu(message);
+        string email = AddPersonEmailMenu(message);
+        DateTime date = AddPersonDoBMenu(message);
         List<Person> personsInDatabase = await _databaseActions.GetAllPersons();
         Person person = new Person(name, phone, email, date);
         if (PersonExists(person, personsInDatabase))
@@ -201,11 +201,12 @@ public class Party
         bool running = true;
         while (running)
         {
-            Console.WriteLine($"===========================" +
-                              $"Add a party!" +
-                              $"===========================" +
+            Console.Clear();
+            Console.WriteLine(
+                              $"Menu> OrderMenu> PartyMenu" +
+                              $"\n---------------------------" +
                               $"\n1) Add new person to party \n2) Add Already Registered Person to party \n3) Delete person from party\n4) Done \n0) Quit");
-
+            Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
 
             if (!int.TryParse(input, out int choice))
@@ -243,45 +244,47 @@ public class Party
 
     public string AddPersonNameMenu(string message)
     {
-        
-        Console.WriteLine($"===========================" +
-                          $"Add {message}: " +                   
-                          $"===========================" +               
-                          $"\nEnter person name: ");   
+        Console.Clear();
+        Console.WriteLine(
+                          $"Menu> OrderMenu> PartyMenu> Add{message}" +                   
+                          $"\n---------------------------" +               
+                          $"\nEnter Firstname and Lastname name of the {message}: ");
         string input = Console.ReadLine();    
         Debug.Assert(input != null);
         return input;
     }
 
-    public string AddPersonNumberMenu()
+    public string AddPersonNumberMenu(string message)
     {
-        Console.WriteLine($"===========================" +
-                          $"Add Person: " +                   
-                          $"===========================" +               
-                          $"\nEnter persons phone number: ");   
+        Console.Clear();
+        Console.WriteLine(
+            $"Menu> OrderMenu> PartyMenu> Add{message}" +                   
+                          $"\n---------------------------" +               
+                          $"\nEnter persons phone number of the {message}: ");   
         string input = Console.ReadLine();    
         Debug.Assert(input != null);
         return input;
     }
     
-    public string AddPersonEmailMenu()
+    public string AddPersonEmailMenu(string message)
     {
-        Console.WriteLine($"===========================" +
-                          $"Add Person: " +                   
-                          $"===========================" +               
-                          $"\nEnter persons email: ");   
+        Console.Clear();
+        Console.WriteLine(
+            $"Menu> OrderMenu> PartyMenu> Add{message}" +                   
+                          $"\n---------------------------" +               
+                          $"\nEnter persons email of the {message}: ");   
         string input = Console.ReadLine();    
         Debug.Assert(input != null);
         return input;
     }
     
-    public DateTime AddPersonDoBMenu()
+    public DateTime AddPersonDoBMenu(string message)
     {
-        Console.WriteLine("===========================");
-        Console.WriteLine("Add Person");
-        Console.WriteLine("===========================");
-        Console.WriteLine("Enter Date of Birth (e.g., 2000-12-31): ");
-
+        Console.Clear();
+        Console.WriteLine(
+            $"Menu> OrderMenu> PartyMenu> Add{message}" +                   
+            $"\n---------------------------" +               
+            $"\nEnter Date of Birth (e.g., 2000-12-31) of the {message}: "); 
         while (true) // Loop until the user enters a valid date
         {
             string input = Console.ReadLine();
