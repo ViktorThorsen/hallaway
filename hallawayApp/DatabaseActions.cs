@@ -179,7 +179,7 @@ public class DatabaseActions
         try
         {
             await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.\"personxparty\" (\"person_id\", \"party_id\") " +
+                             "INSERT INTO public.\"person_X_party\" (\"person_id\", \"party_id\") " +
                              "VALUES (@personId, @partyId)"))
             {
                 // Add parameters
@@ -228,7 +228,7 @@ public class DatabaseActions
 
         // Step 2: Link the person to the party in the "PersonXParty" table
         await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.\"personxparty\" (\"person_id\", \"party_id\") " +
+                             "INSERT INTO public.\"person_X_party\" (\"person_id\", \"party_id\") " +
                              "VALUES (@personId, @partyId)"))
         {
             // Add parameters
@@ -251,6 +251,64 @@ public class DatabaseActions
         throw;
     }
 }
+    public async Task RemovePersonFromParty(int userId, int partyId)
+    {
+        try
+        {
+            // Delete the entry from person_X_party where the user_id and party_id match
+            await using (var cmd = _db.CreateCommand(
+                             "DELETE FROM public.\"person_X_party\" WHERE \"person_id\" = @userId AND \"party_id\" = @partyId"))
+            {
+                // Add parameters for the user_id and party_id
+                cmd.Parameters.AddWithValue("userId", userId);
+                cmd.Parameters.AddWithValue("partyId", partyId);
+
+                // Execute the query
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Successfully removed user ID {userId} from Party ID {partyId}.");
+                }
+                else
+                {
+                    Console.WriteLine($"No connection found between user ID {userId} and Party ID {partyId}.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error removing user ID {userId} from Party ID {partyId}: {ex.Message}");
+            throw;
+        }
+    }
+    
+    public async Task RemoveAllPersonsFromParty(int partyId)
+    {
+        try
+        {
+            // Delete all entries from person_X_party where the party_id matches
+            await using (var cmd = _db.CreateCommand(
+                             "DELETE FROM public.\"person_X_party\" WHERE \"party_id\" = @partyId"))
+            {
+                cmd.Parameters.AddWithValue("partyId", partyId);
+
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Successfully removed {rowsAffected} persons linked to Party ID {partyId}.");
+                }
+                else
+                {
+                    Console.WriteLine($"No persons were linked to Party ID {partyId}.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error removing persons from party: {ex.Message}");
+            throw;
+        }
+    }
     public async Task<List<Person>> GetAllPersons()
     {
         var persons = new List<Person>();
