@@ -49,8 +49,8 @@ public class DatabaseActions
                 while (await reader.ReadAsync())
                 {
                     Room room = new Room(
-                        reader.GetInt32(1),   // Room number
-                        reader.GetDouble(2),  // Price
+                        reader.GetDouble(1),   // Room number
+                        reader.GetInt32(2),  // Price
                         true
                     );
 
@@ -79,7 +79,7 @@ public class DatabaseActions
     }
     
     // Method that reads all the hotels from the database and returns them as objects
-    public async Task<Hotel> GetHotel(string hotelName)
+    /*public async Task<Hotel> GetHotel(string hotelName)
     {
         // Use a parameterized query to avoid SQL injection
         await using (var cmd = _db.CreateCommand($"SELECT * FROM public.\"hotel\" WHERE \"hotel_name\" = @hotelName"))
@@ -117,7 +117,7 @@ public class DatabaseActions
         }
 
         return null; // Return null if the hotel is not found
-    }
+    }*/
 
     public async Task<int> AddEmptyParty()
     {
@@ -400,6 +400,70 @@ public class DatabaseActions
                 
         }
     }
+    
+    public async Task<List<Hotel>> GetAllHotels()
+{
+    var hotels = new List<Hotel>();
+
+    try
+    {
+        // Prepare the SQL command to fetch hotel data
+        await using (var cmd = _db.CreateCommand(
+            "SELECT \"hotel_id\", \"hotel_name\", \"address\", \"pool\",\"resturant\",\"kidsclub\", \"rating\", \"distancebeach\", " +
+            "\"distancecitycenter\", \"evningentertainment\" FROM \"hotel\" ORDER BY \"hotel_id\""))
+        {
+            // Execute the command and get a data reader
+            await using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    // Extract data from each column
+                    int hotelId = reader.GetInt32(reader.GetOrdinal("hotel_id"));
+                    string hotelName = reader.GetString(reader.GetOrdinal("hotel_name"));
+                    int addressId = reader.GetInt32(reader.GetOrdinal("address"));
+                    bool hasPool = reader.GetBoolean(reader.GetOrdinal("pool"));
+                    int dbRating = reader.GetInt32(reader.GetOrdinal("rating"));
+                    bool restaurante = reader.GetBoolean(reader.GetOrdinal("resturant"));
+                    bool kidsClub = reader.GetBoolean(reader.GetOrdinal("kidsclub"));
+                    Rating rating = (Rating)dbRating;
+                    int distancebeach = reader.GetInt32(reader.GetOrdinal("distancebeach"));
+                    int distanceCityCenter = reader.GetInt32(reader.GetOrdinal("distancecitycenter"));
+                    bool eveningEntertainment = reader.GetBoolean(reader.GetOrdinal("evningentertainment"));
+
+                    // Fetch related data
+                    Address address = await GetAddress(addressId); // Retrieve address based on ID
+                    var rooms = await GetRooms(hotelId);          // Retrieve rooms for this hotel
+
+                    // Create a new Hotel object
+                    var hotel = new Hotel(
+                        hotelId: hotelId,
+                        hotelName: hotelName,
+                        address: address,
+                        pool: hasPool,
+                        restaurante: restaurante,
+                        kidsClub: kidsClub,
+                        ratingEnum: rating,
+                        distanceBeach: distancebeach,
+                        distanceCityCenter: distanceCityCenter,
+                        eveningEntertainment: eveningEntertainment,
+                        roomList: rooms
+                    );
+
+                    // Add the hotel to the list
+                    hotels.Add(hotel);
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while fetching hotels: {ex.Message}");
+        // Handle or log the exception as necessary
+    }
+
+    return hotels;
+}
+    
     //add new Room to DB
     public async void AddRoom(double price, int size, bool avalible)
     {

@@ -28,10 +28,7 @@ public class Menu
                 
                 break;
             case 3:
-                string hotelName = "Lugnets Retreat";
-                Hotel hotelTest = await databaseActions.GetHotel(hotelName);
                 
-                Console.WriteLine(hotelTest.address.Street.ToString());
                 break;
             case 0:
                 Console.WriteLine("Goodbye!"); // Quit!

@@ -6,8 +6,7 @@ public class Hotel
     public string hotelName;
     public Address address;
     private bool pool;
-    private enum ratingEnum;
-
+    private Rating ratingEnum;
     public bool restaurante;
     public bool kidsClub;
     private int distanceBeach;
@@ -19,7 +18,7 @@ public class Hotel
     public static List<Hotel> G;
 
     //Constructor Hotel
-    public Hotel(int hotelId, string hotelName, Address address, bool pool, bool restaurante, bool kidsClub,
+    public Hotel(int hotelId, string hotelName, Address address, bool pool,Rating ratingEnum, bool restaurante, bool kidsClub,
         int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList)
     {
         this.hotelID = hotelId;
@@ -27,6 +26,7 @@ public class Hotel
         this.address = address;
         
         this.pool = pool;
+        this.ratingEnum = ratingEnum;
         this.restaurante = restaurante;
         this.kidsClub = kidsClub;
         this.distanceBeach = distanceBeach;

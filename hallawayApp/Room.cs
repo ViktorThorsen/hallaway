@@ -2,11 +2,11 @@
 
 public class Room
 {
-    private int _price;
-    private double _size;
+    private double _price;
+    private int _size;
     private bool _isAvailable;
  
-    public Room(int price, double size, bool isAvailable)
+    public Room(double price, int size, bool isAvailable)
     {
         this._price = price;
         this._size = size;
