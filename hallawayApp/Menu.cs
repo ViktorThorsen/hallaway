@@ -4,8 +4,10 @@ namespace hallawayApp;
 
 public class Menu
 {
-    public void CallMainMenu()
+    private DatabaseActions _databaseActions;
+    public async Task CallMainMenu(DatabaseActions databaseActions)
     {
+        this._databaseActions = databaseActions;
         Console.WriteLine($"===========================" +
                           $"Welcome to Hallaway!" +
                           $"===========================" +
@@ -18,13 +20,17 @@ public class Menu
         switch (input)
         {
             case 1:
-                Order order = new Order();
+                Order order = new Order(_databaseActions);
+                await order.CreateOrder();
                 break;
             case 2:
                 
                 break;
             case 3:
+                string hotelName = "Lugnets Retreat";
+                Hotel hotelTest = await databaseActions.GetHotel(hotelName);
                 
+                Console.WriteLine(hotelTest.address.Street.ToString());
                 break;
             case 0:
                 Console.WriteLine("Goodbye!"); // Quit!

@@ -3,25 +3,22 @@ using System.Diagnostics;
 public class Order
 {
     private string orderName;
-    private Party party = new Party();
+    private Party party;
     private Admin admin;
     private Hotel hotel;
     private DateTime date;
     private double totalPrice;
     private List<Addon> addonList;
+    private DatabaseActions _databaseActions;
 
-    public Order()
-    
-    
-    
+    public Order(DatabaseActions databaseActions)
     {
-        CallCreateOrder();
+        _databaseActions = databaseActions;
     }
-    
-    
 
-    public void CallCreateOrder()
+    public async Task CreateOrder()
     {
+        party = new Party(_databaseActions);
         bool running = true;
 
         while (running){
@@ -40,7 +37,7 @@ public class Order
         switch (input)
         {
             case 1:
-                party.AddPartyMenu();
+                await party.PartyMenu();
                 break;
             case 2:
                 // Pick a date
@@ -73,36 +70,5 @@ public class Order
         Console.WriteLine($"Start Date: ");
         Console.WriteLine($"Destination: ");
     }
-    
-    //  Method that produces a list of hotels
-    public void ShowAllHotels()
-    {
-        // Get list of hotels from the database
-        List<Hotel> hotelList = _databaseActions.GetHotelsFromDatabase();
-
-        // Checking if the list hotelList is empty
-        if (hotelList.Count == 0) 
-        {
-            // If no hotels are found
-            Console.WriteLine("No hotels available.");
-        }
-        else
-        {
-            // Showing available hotels
-            Console.WriteLine("Available hotels:");
-            foreach (var hotel in hotelList)
-            {
-                // Showing hotel details 
-                Console.WriteLine($"Name: {hotel.hotelName},Address: {hotel.address}," +
-                                  $"Pool: {hotel.pool}," +
-                                  $"KidsClub: {hotel.kidsClub}, Distance to beach: {hotel.distanceBeach}" +
-                                  $"Distance to city: {hotel.distanceCityCenter}," +
-                                  $"Evening entertainment: {hotel.eveningEntertainment}");
-            }
-        }
-        Console.WriteLine();
-    }
-}
-    
     
 }

@@ -1,30 +1,25 @@
-﻿using Npgsql;
-
-namespace hallawayApp;
+﻿namespace hallawayApp;
 
 public class Hotel
 {
     public string hotelName;
     public Address address;
-    public bool pool;
+    private bool pool;
     private enum ratingEnum;
 
     public bool restaurante;
     public bool kidsClub;
-    public int distanceBeach;
+    private int distanceBeach;
     public int distanceCityCenter;
-    public bool eveningEntertainment;
+    private bool eveningEntertainment;
     private List<Room> roomList;
     private List<Addon> addonList;
-
-  
-  
     
+    public static List<Hotel> G;
 
     //Constructor Hotel
     public Hotel(string hotelName, Address address, bool pool, bool restaurante, bool kidsClub,
-        int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList,
-        List<Addon> addonList)
+        int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList)
     {
         this.hotelName = hotelName;
         this.address = address;
@@ -38,10 +33,20 @@ public class Hotel
         this.roomList = roomList;
         this.addonList = addonList;
         
+        Console.Clear();
+        SelectDestinationMenu();
     }
     
 
+    private void SelectDestinationMenu()
+    {
+       
+        
+    }
     
     
-    
+    private void GetHotel()
+    {
+        
+    }
 }
