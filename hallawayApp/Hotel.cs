@@ -4,16 +4,16 @@ namespace hallawayApp;
 
 public class Hotel
 {
-    private string hotelName;
-    private Address address;
-    private bool pool;
+    public string hotelName;
+    public Address address;
+    public bool pool;
     private enum ratingEnum;
 
-    private bool restaurante;
-    private bool kidsClub;
-    private int distanceBeach;
-    private int distanceCityCenter;
-    private bool eveningEntertainment;
+    public bool restaurante;
+    public bool kidsClub;
+    public int distanceBeach;
+    public int distanceCityCenter;
+    public bool eveningEntertainment;
     private List<Room> roomList;
     private List<Addon> addonList;
 
@@ -38,8 +38,10 @@ public class Hotel
         this.roomList = roomList;
         this.addonList = addonList;
         
-       
     }
+    
+
+    
     
     
 }

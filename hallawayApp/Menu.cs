@@ -9,7 +9,9 @@ public class Menu
         Console.WriteLine($"===========================" +
                           $"Welcome to Hallaway!" +
                           $"===========================" +
-                          $"\n1) Create new Order \n2) Edit Registered Persons \n3) Edit Hotels \n0 Quit");
+                          $"\n1) Create new Order \n2)" +
+                          $" Edit Registered P" +
+                          $"ersons \n3) Edit Hotels \n0 Quit");
         int input = Int32.Parse(Console.ReadLine());
         Debug.Assert(input != null);
 
@@ -31,4 +33,7 @@ public class Menu
                 break;
         }
     }
-}
+    
+    }
+   
+    

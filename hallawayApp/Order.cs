@@ -11,6 +11,9 @@ public class Order
     private List<Addon> addonList;
 
     public Order()
+    
+    
+    
     {
         CallCreateOrder();
     }
@@ -70,5 +73,36 @@ public class Order
         Console.WriteLine($"Start Date: ");
         Console.WriteLine($"Destination: ");
     }
+    
+    //  Method that produces a list of hotels
+    public void ShowAllHotels()
+    {
+        // Get list of hotels from the database
+        List<Hotel> hotelList = _databaseActions.GetHotelsFromDatabase();
+
+        // Checking if the list hotelList is empty
+        if (hotelList.Count == 0) 
+        {
+            // If no hotels are found
+            Console.WriteLine("No hotels available.");
+        }
+        else
+        {
+            // Showing available hotels
+            Console.WriteLine("Available hotels:");
+            foreach (var hotel in hotelList)
+            {
+                // Showing hotel details 
+                Console.WriteLine($"Name: {hotel.hotelName},Address: {hotel.address}," +
+                                  $"Pool: {hotel.pool}," +
+                                  $"KidsClub: {hotel.kidsClub}, Distance to beach: {hotel.distanceBeach}" +
+                                  $"Distance to city: {hotel.distanceCityCenter}," +
+                                  $"Evening entertainment: {hotel.eveningEntertainment}");
+            }
+        }
+        Console.WriteLine();
+    }
+}
+    
     
 }
