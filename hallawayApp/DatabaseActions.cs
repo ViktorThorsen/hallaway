@@ -99,6 +99,7 @@ public class DatabaseActions
 
                     // Construct the Hotel object
                     Hotel hotel = new Hotel(
+                        reader.GetInt32(0), //hotel_id
                         reader.GetString(1),  // hotel_name
                         address,              // Address object
                         reader.GetBoolean(3), // pool
@@ -354,9 +355,8 @@ public class DatabaseActions
     }
 
     // Add new AddOn to DB, missing order_id
-    public async void AddAddon(string name, string description, double price, Hotel hotel)
+    public async void AddAddon(string name, string description, double price, int hotel_id)
     {
-        int hotel_id = (GetHotel(hotel.hotelName).Id);
         await using (var cmd = _db.CreateCommand(
                          "INSERT INTO public.\"AddOn\" (\"name\", \"description\", \"price\", \"hotel\") VALUES ($1, $2, $3, $4)"))
         {
