@@ -48,7 +48,7 @@ public class Order
                 
                 break;
             case 4:
-                ShowOrderDetails();
+                ShowOrderDetailsMenu();
                 break;
             case 5:
                 running = false;
@@ -62,15 +62,36 @@ public class Order
         }}
     }
 
-    public void ShowOrderDetails()
+    public async Task ShowOrderDetailsMenu()
     {
-        Console.WriteLine($"===========================");
-        foreach (Person person in party._persons)
+        bool viewingDetails = true;
+
+        while (viewingDetails)
         {
-            Console.WriteLine($"{person.name}");
+            Console.Clear();
+            Console.WriteLine($"Menu> OrderMenu \n---------------------------");
+            foreach (Person person in party._persons)
+            {
+                Console.WriteLine($"{person.name}");
+            }
+            Console.WriteLine($"Start Date: ");
+            Console.WriteLine($"Destination: ");
+            Console.WriteLine("\n0) Back");
+
+            Console.WriteLine("\nEnter 0 to back: ");
+            string input = Console.ReadLine();
+
+            if (input == "0")
+            {
+                viewingDetails = false; // Exit the details menu
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter '0' to go back.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
         }
-        Console.WriteLine($"Start Date: ");
-        Console.WriteLine($"Destination: ");
     }
     //  Method that produces a list of hotels
     /*

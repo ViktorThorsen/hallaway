@@ -93,18 +93,27 @@ public class Party
         Console.WriteLine("No persons found in the database.");
         return; // Exit if there are no persons
     }
+    Console.Clear();
+    Console.WriteLine($"Menu> OrderMenu> PartyMenu" +
+                      $"\n---------------------------"); 
 
-    Console.WriteLine("===========================\nSelect a Person:");
-    for (int i = 0; i < personsInDataBase.Count; i++)
+    // Split the persons into two columns
+    int halfCount = (personsInDataBase.Count + 1) / 2;
+
+    for (int i = 0; i < halfCount; i++)
     {
-        Console.WriteLine($"{i + 1}) {personsInDataBase[i].name}");
+        string firstColumn = $"{i + 1}) {personsInDataBase[i].name}";
+        string secondColumn = (i + halfCount < personsInDataBase.Count)
+            ? $"{i + 1 + halfCount}) {personsInDataBase[i + halfCount].name}"
+            : ""; // Handle the case when the number of persons is odd
+        Console.WriteLine($"{firstColumn,-30} {secondColumn}");
     }
 
     Console.WriteLine("0) Cancel");
 
     while (true)
     {
-        Console.Write("\nEnter your choice: ");
+        Console.Write($"\nEnter the Person that you want to add: ");
         string input = Console.ReadLine();
 
         if (!int.TryParse(input, out int choice))
@@ -260,7 +269,7 @@ public class Party
         Console.WriteLine(
             $"Menu> OrderMenu> PartyMenu> Add{message}" +                   
                           $"\n---------------------------" +               
-                          $"\nEnter persons phone number of the {message}: ");   
+                          $"\nEnter Phone number of the {message}: ");   
         string input = Console.ReadLine();    
         Debug.Assert(input != null);
         return input;
@@ -272,7 +281,7 @@ public class Party
         Console.WriteLine(
             $"Menu> OrderMenu> PartyMenu> Add{message}" +                   
                           $"\n---------------------------" +               
-                          $"\nEnter persons email of the {message}: ");   
+                          $"\nEnter Email of the {message}: ");   
         string input = Console.ReadLine();    
         Debug.Assert(input != null);
         return input;
