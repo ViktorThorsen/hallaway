@@ -32,7 +32,7 @@ create table if not exists "person"
     name          varchar,
     phone         varchar,
     email         varchar,
-    date_of_birth date,
+    date_of_birth date
 );
 
 alter table "person"
