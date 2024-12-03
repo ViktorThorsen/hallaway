@@ -4,6 +4,7 @@ public class HotelManager
 {
     private DatabaseActions _databaseActions;
     private List<Hotel> hotelList;
+    private List<Hotel> filteredHotels;
     public HotelManager(DatabaseActions databaseActions)
     {
         _databaseActions = databaseActions;
@@ -18,7 +19,7 @@ public class HotelManager
             Console.WriteLine(
                 $"Menu> OrderMenu> PartyMenu" +
                 $"\n---------------------------" +
-                $"\n1) Show all hotels \n2) Filter on city \n3) Filter on distance to the beach\n4) Done \n0) Quit");
+                $"\n1) Show all hotels \n2) Filter on city \n3) Filter on distance to the beach\n4) Filter on room size\n5) Filter on price\n6) Filter on availability\n7) Filter on kids club\n\n\n\n\n\n\n \n0) Quit");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
 
@@ -31,7 +32,7 @@ public class HotelManager
             switch (choice)
             {
                 case 1:
-                    ShowHotels();
+                    SelectHotel();
                     break;
                 case 2:
                     FilterOnCity();
@@ -44,6 +45,22 @@ public class HotelManager
                     break;
                 case 5:
                     FilterOnPrice();
+                    break;
+                case 6:
+                    FilterOnIsAvailable();
+                    break;
+                case 7:
+                    FilterOnKidsClub();
+                    break;
+                case 8:
+                    break;
+                case 9:
+                    break;
+                case 10:
+                    break;
+                case 11:
+                    break;
+                case 12:
                     break;
                 case 0:
                     Console.WriteLine("Goodbye!");
@@ -79,22 +96,8 @@ public class HotelManager
             {
                 if (hotel.address.City == city)
                 {
-                    Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
-                                      $"\n\taddress: {hotel.address.Street} " +
-                                      $"\n\tpool: {hotel.pool} " +
-                                      $"\n\trestaurant: {hotel.restaurante}" +
-                                      $"\n\tkid's club: {hotel.kidsClub}" +
-                                      $"\n\trating: {hotel.ratingEnum} stars" +
-                                      $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
-                                      $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
-                                      $"\n\tevening entertainment: {hotel.eveningEntertainment}");
-                    foreach (var room in hotel.roomList)
-                    {
-                        
-                        Console.WriteLine($"\nsize: {room._size}m2" +
-                                          $"\nAvailable: {room._isAvailable}" +
-                                          $"\n\n\tprice: {room._price}kr");
-                    }
+                    Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName}" +
+                                      $"\n\taddress: {hotel.address.Street}");
                 }
             }
             Console.Write("Press enter to continue");
@@ -121,20 +124,8 @@ public class HotelManager
                 if (hotel.distanceBeach <= distance)
                 {
                     Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
-                                      $"\n\taddress: {hotel.address.Street} " +
-                                      $"\n\tpool: {hotel.pool} " +
-                                      $"\n\trestaurant: {hotel.restaurante}" +
-                                      $"\n\tkid's club: {hotel.kidsClub}" +
-                                      $"\n\trating: {hotel.ratingEnum} stars" +
-                                      $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
-                                      $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
-                                      $"\n\tevening entertainment: {hotel.eveningEntertainment}");
-                }
-                foreach (var room in hotel.roomList)
-                {
-                    Console.WriteLine($"\nsize: {room._size}m2" +
-                                      $"\nAvailable: {room._isAvailable}" +
-                                      $"\n\n\tprice: {room._price}kr");
+                                      $"\n\taddress: {hotel.address.Street}" +
+                                      $"\n\tdistance to the beach: {hotel.distanceBeach}m");
                 }
             }
             Console.Write("Press enter to continue");
@@ -162,19 +153,8 @@ public class HotelManager
                     {
                         Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
                                           $"\n\taddress: {hotel.address.Street} " +
-                                          $"\n\tpool: {hotel.pool} " +
-                                          $"\n\trestaurant: {hotel.restaurante}" +
-                                          $"\n\tkid's club: {hotel.kidsClub}" +
-                                          $"\n\trating: {hotel.ratingEnum} stars" +
-                                          $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
-                                          $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
-                                          $"\n\tevening entertainment: {hotel.eveningEntertainment}" +
-                                          $"\n\troom size: {room._size}" +
-                                          $"\nsize: {room._size}m2" +
-                                          $"\nAvailable: {room._isAvailable}" +
-                                          $"\n\n\tprice: {room._price}kr");
+                                          $"\n\troom size: {room._size}");
                     }
-                    
                 }
             }
             Console.Write("Press enter to continue");
@@ -202,17 +182,7 @@ public class HotelManager
                     {
                         Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
                                           $"\n\taddress: {hotel.address.Street} " +
-                                          $"\n\tpool: {hotel.pool} " +
-                                          $"\n\trestaurant: {hotel.restaurante}" +
-                                          $"\n\tkid's club: {hotel.kidsClub}" +
-                                          $"\n\trating: {hotel.ratingEnum} stars" +
-                                          $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
-                                          $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
-                                          $"\n\tevening entertainment: {hotel.eveningEntertainment}" +
-                                          $"\n\troom size: {room._size}" +
-                                          $"\nsize: {room._size}m2" +
-                                          $"\nAvailable: {room._isAvailable}" +
-                                          $"\n\n\tprice: {room._price}kr");
+                                          $"\n\tprice: {room._price}kr");
                     }
                 }
             }
@@ -240,17 +210,7 @@ public class HotelManager
                     {
                         Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
                                           $"\n\taddress: {hotel.address.Street} " +
-                                          $"\n\tpool: {hotel.pool} " +
-                                          $"\n\trestaurant: {hotel.restaurante}" +
-                                          $"\n\tkid's club: {hotel.kidsClub}" +
-                                          $"\n\trating: {hotel.ratingEnum} stars" +
-                                          $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
-                                          $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
-                                          $"\n\tevening entertainment: {hotel.eveningEntertainment}" +
-                                          $"\n\troom size: {room._size}" +
-                                          $"\nsize: {room._size}m2" +
-                                          $"\nAvailable: {room._isAvailable}" +
-                                          $"\n\n\tprice: {room._price}kr");
+                                          $"\nAvailable: {room._isAvailable}");
                     }
                 }
             }
@@ -269,28 +229,15 @@ public class HotelManager
         if (hotelList.Any(hotel => hotel.roomList.Any(room => room._isAvailable)))
         {
             Console.Clear();
-            Console.WriteLine($"Hotels with available rooms: ");
+            Console.WriteLine($"Hotels with kids club: ");
             foreach (var hotel in hotelList)
             {
                 if (hotel.kidsClub)
                 {
                     Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
                                       $"\n\taddress: {hotel.address.Street} " +
-                                      $"\n\tpool: {hotel.pool} " +
-                                      $"\n\trestaurant: {hotel.restaurante}" +
-                                      $"\n\tkid's club: {hotel.kidsClub}" +
-                                      $"\n\trating: {hotel.ratingEnum} stars" +
-                                      $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
-                                      $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
-                                      $"\n\tevening entertainment: {hotel.eveningEntertainment}");
+                                      $"\n\trating: {hotel.ratingEnum} stars");
 
-                }
-                foreach (var room in hotel.roomList)
-                { 
-                    Console.WriteLine($"\n\troom size: {room._size}" +
-                                      $"\nsize: {room._size}m2" +
-                                      $"\nAvailable: {room._isAvailable}" +
-                                      $"\n\n\tprice: {room._price}kr");
                 }
             }
             Console.Write("Press enter to continue");
@@ -302,5 +249,120 @@ public class HotelManager
             Console.Write("Press enter to continue");
             Console.ReadLine();
         }
+    }
+
+    private void FilterOnPool()
+    {
+            Console.Clear();
+            Console.WriteLine($"Hotels with a pool: ");
+            foreach (var hotel in hotelList)
+            {
+                if (hotel.pool)
+                {
+                    Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
+                                      $"\n\taddress: {hotel.address.Street} " +
+                                      $"\n\tpool: {hotel.pool} ");
+                    Console.Write("Press enter to continue");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    Console.WriteLine($"Could not find any hotels with pools");
+                    Console.Write("Press enter to continue");
+                    Console.ReadLine();
+                }
+            }
+    }
+
+    private void FilterOnResturant()
+    {
+        Console.Clear();
+        Console.WriteLine($"Hotels with available rooms: ");
+        foreach (var hotel in hotelList)
+        {
+            if (hotel.restaurante)
+            {
+                Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
+                                  $"\n\taddress: {hotel.address.Street} " +
+                                  $"\n\tpool: {hotel.restaurante} ");
+                Console.Write("Press enter to continue");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine($"Could not find any hotels with restaurants");
+                Console.Write("Press enter to continue");
+                Console.ReadLine();
+            }
+        }
+    }
+    private void FilterOnRating()
+    {
+        int input = Int32.Parse(Console.ReadLine());
+       
+        {
+            Console.Clear();
+            Console.WriteLine($"Hotels with {input} stars: ");
+            foreach (var hotel in hotelList)
+            {
+                foreach (var room in hotel.roomList)
+                {
+                    if ((int)hotel.ratingEnum == input)
+                    {
+                        Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
+                                          $"\n\taddress: {hotel.address.Street} " +
+                                          $"\nAvailable: {room._isAvailable}");
+                    }
+                }
+            }
+            Console.Write("Press enter to continue");
+            Console.ReadLine();
+        }
+    }
+    private void FilterOnDistanceCityCenter()
+    {
+        Console.Clear();
+        Console.WriteLine($"Please enter a max distance to the city center: ");
+        int distance = Int32.Parse(Console.ReadLine());
+        if (hotelList.Any(hotel => hotel.distanceBeach <= distance))
+        {
+            Console.Clear();
+            Console.WriteLine($"Hotels within {distance}m:");
+            foreach (var hotel in hotelList)
+            {
+                if (hotel.distanceCityCenter <= distance)
+                {
+                    Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
+                                      $"\n\taddress: {hotel.address.Street}" +
+                                      $"\n\tdistance to the beach: {hotel.distanceCityCenter}m");
+                }
+            }
+            Console.Write("Press enter to continue");
+            Console.ReadLine();
+        }
+        else
+        {
+            Console.WriteLine($"Could not find any hotels within {distance}m");
+            Console.Write("Press enter to continue");
+            Console.ReadLine();
+        }
+    }
+
+    private Hotel SelectHotel()
+    {
+        Console.WriteLine("Enter a hotel id to select a hotel");
+        int index = Int32.Parse(Console.ReadLine());
+        foreach (var hotel in hotelList)
+        {
+            if (hotel.hotelID == index)
+            {
+                return hotel;
+            }
+            else
+            {
+                Console.WriteLine($"No hotel found at {index}");
+            }
+        }
+        return null;
     }
 }
