@@ -44,11 +44,11 @@ public class HotelManager
                     running = false; // Exit the menu loop
                     break;
                 case 10:
-                    hotelList = await SortHotelsByPool();
-                    ShowHotels();
+                    SelectHotels(1);
+                    
                     break;
                 case 11:
-                    hotelList = await SortHotelsByRestaurant();
+                    // hotelList = await SortHotelsByRestaurant(); 
                     ShowHotels();
                     break;
                 case 12: 
@@ -60,7 +60,7 @@ public class HotelManager
                     ShowHotels();
                     break;
                 case 14:
-                    hotelList = await SortHotelsByEveningEntertainment();
+                    // hotelList = await SortHotelsByEveningEntertainment(); 
                     ShowHotels();
                     break;
                     
@@ -85,58 +85,23 @@ public class HotelManager
 
         Console.ReadLine();
     }
-    
-    private async Task<List<Hotel>> SortHotelsByPool() 
-    { 
-        var allHotels = await _databaseActions.GetAllHotels(); 
-        var hotelsWithPool = new List<Hotel>();
 
-        foreach (var hotel in allHotels)
-        {
-            if (hotel.pool)
-            {
-                hotelsWithPool.Add(hotel);
-            }
-        } 
-        return hotelsWithPool; 
-    }
-
-    private async Task<List<Hotel>>  SortHotelsByRestaurant()
+    private void SelectHotels(int index)
     {
-        var allHotels = await _databaseActions.GetAllHotels();
-        var hotelsWithRestaurant = new List<Hotel>();
-
-        foreach (var hotel in allHotels)
+        foreach (var hotel in hotelList)
         {
-            if (hotel.restaurante)
+            if ( == index)
             {
-                hotelsWithRestaurant.Add(hotel);
+                // return hotel;
+                
+                Console.WriteLine($"{hotel.hotelName}");
             }
-            return hotelsWithRestaurant;
-        }
-
-        return null;
-    }
-
-    
-
-  
-    private async Task<List<Hotel>> SortHotelsByEveningEntertainment()
-    {
-        var allHotels = await _databaseActions.GetAllHotels();
-        var hotelsWithEveningEntertainment = new List<Hotel>();
-
-        foreach (var hotel in allHotels)
-        {
-            if (hotel.eveningEntertainment)
+            else
             {
-                hotelsWithEveningEntertainment.Add(hotel);
+                Console.WriteLine("No available hotels");
             }
-            return hotelsWithEveningEntertainment;  
         }
-        return null;
     }
-
 }
         
         
