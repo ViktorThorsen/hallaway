@@ -4,7 +4,6 @@ public class Order
 {
     private string orderName;
     private Party party;
-    private HotelManager _hotelManager;
     private Admin admin;
     private Hotel hotel;
     private DateTime date;
@@ -20,7 +19,6 @@ public class Order
     public async Task CreateOrder(int admin)
     {
         party = new Party(_databaseActions);
-        _hotelManager = new HotelManager(_databaseActions);
         bool running = true;
 
         while (running){ 
@@ -47,7 +45,7 @@ public class Order
                 // Pick a date
                 break;
             case 3:
-                await _hotelManager.FindHotelMenu();
+                
                 break;
             case 4:
                 ShowOrderDetailsMenu();
