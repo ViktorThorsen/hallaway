@@ -17,11 +17,11 @@ public class DatabaseActions
     {
         await using (var cmd = _db.CreateCommand("SELECT * FROM \"address\" WHERE \"location_id\" = @locationId"))
         {
-            cmd.Parameters.AddWithValue("locationId", locationId);
+            cmd.Parameters.AddWithValue( locationId);
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
-                if (await reader.ReadAsync()) // Check if a row is available
+                if (await reader.ReadAsync())
                 {
                     
                     // Assuming Address takes two string parameters
