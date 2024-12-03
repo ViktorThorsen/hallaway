@@ -17,7 +17,7 @@ public class HotelManager
             Console.WriteLine(
                 $"Menu> OrderMenu> PartyMenu" +
                 $"\n---------------------------" +
-                $"\n1) Show all hotels \n2) Add Already Registered Person to party \n3) Delete person from party\n4) Done \n0) Quit");
+                $"\n1) Show all hotels \n2) Add Already Registered Person to party \n3) Delete person from party\n4) Done \n10) Sort hotels by pool \n0) Quit");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
 
@@ -43,6 +43,27 @@ public class HotelManager
                
                     running = false; // Exit the menu loop
                     break;
+                case 10:
+                    hotelList = await SortHotelsByPool();
+                    ShowHotels();
+                    break;
+                case 11:
+                    hotelList = await SortHotelsByRestaurant();
+                    ShowHotels();
+                    break;
+                case 12: 
+                    // hotelList = await SortHotelsByRating(); 
+                    ShowHotels();
+                    break;
+                case 13:
+                    // hotelList = await SortHotelsByDistanceCityCenter(); 
+                    ShowHotels();
+                    break;
+                case 14:
+                    hotelList = await SortHotelsByEveningEntertainment();
+                    ShowHotels();
+                    break;
+                    
                 case 0:
                     Console.WriteLine("Goodbye!");
                  
@@ -64,4 +85,62 @@ public class HotelManager
 
         Console.ReadLine();
     }
+    
+    private async Task<List<Hotel>> SortHotelsByPool() 
+    { 
+        var allHotels = await _databaseActions.GetAllHotels(); 
+        var hotelsWithPool = new List<Hotel>();
+
+        foreach (var hotel in allHotels)
+        {
+            if (hotel.pool)
+            {
+                hotelsWithPool.Add(hotel);
+            }
+        } 
+        return hotelsWithPool; 
+    }
+
+    private async Task<List<Hotel>>  SortHotelsByRestaurant()
+    {
+        var allHotels = await _databaseActions.GetAllHotels();
+        var hotelsWithRestaurant = new List<Hotel>();
+
+        foreach (var hotel in allHotels)
+        {
+            if (hotel.restaurante)
+            {
+                hotelsWithRestaurant.Add(hotel);
+            }
+            return hotelsWithRestaurant;
+        }
+
+        return null;
+    }
+
+    
+
+  
+    private async Task<List<Hotel>> SortHotelsByEveningEntertainment()
+    {
+        var allHotels = await _databaseActions.GetAllHotels();
+        var hotelsWithEveningEntertainment = new List<Hotel>();
+
+        foreach (var hotel in allHotels)
+        {
+            if (hotel.eveningEntertainment)
+            {
+                hotelsWithEveningEntertainment.Add(hotel);
+            }
+            return hotelsWithEveningEntertainment;  
+        }
+        return null;
+    }
+
 }
+        
+        
+
+       
+    
+    

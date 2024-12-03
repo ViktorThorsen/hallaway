@@ -5,13 +5,13 @@ public class Hotel
     public int hotelID;
     public string hotelName;
     public Address address;
-    private bool pool;
-    private Rating ratingEnum;
+    public bool pool;
+    public Rating ratingEnum;
     public bool restaurante;
     public bool kidsClub;
     private int distanceBeach;
     public int distanceCityCenter;
-    private bool eveningEntertainment;
+    public bool eveningEntertainment;
     private List<Room> roomList;
     private List<Addon> addonList;
     
