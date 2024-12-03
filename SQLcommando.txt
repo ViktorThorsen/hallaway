@@ -122,7 +122,7 @@ create table if not exists "hotel"
 alter table "hotel"
     owner to postgres;
 
-create table if not exists "addon_X_hotel"
+create table if not exists "addon_x_hotel"
 (
     addon_id integer
         constraint addon_id_fk
@@ -132,10 +132,10 @@ create table if not exists "addon_X_hotel"
             references "hotel"
 );
 
-alter table "addon_X_hotel"
+alter table "addon_x_hotel"
     owner to postgres;
 
-create table if not exists "person_X_party"
+create table if not exists "person_x_party"
 (
     person_id integer
         constraint person_person_part_id_fk
@@ -145,5 +145,5 @@ create table if not exists "person_X_party"
             references "party"
 );
 
-alter table "person_X_party"
+alter table "person_x_party"
     owner to postgres;
