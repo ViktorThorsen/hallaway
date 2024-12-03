@@ -4,6 +4,7 @@ public class Order
 {
     private string orderName;
     private Party party;
+    private HotelManager _hotelManager;
     private Admin admin;
     private Hotel hotel;
     private DateTime date;
@@ -19,18 +20,21 @@ public class Order
     public async Task CreateOrder()
     {
         party = new Party(_databaseActions);
+        _hotelManager = new HotelManager(_databaseActions);
         bool running = true;
 
-        while (running){
+        while (running){ 
+            Console.Clear();
         Console.WriteLine(
-                          $"===========================" +
-                          $"===========================" + 
+                          $"Menu> OrderMenu" +
+                          $"\n---------------------------" + 
                           $"\n1) Manage party " +
                           $"\n2) Set date " +
                           $"\n3) Select destination " +
                           $"\n4) View details " +
                           $"\n5) Done " +
                           $"\n0) Quit");
+        Console.WriteLine("\nEnter your choice: ");
         int input = Int32.Parse(Console.ReadLine());
         Debug.Assert(input != null);
 
@@ -43,10 +47,10 @@ public class Order
                 // Pick a date
                 break;
             case 3:
-                
+                await _hotelManager.FindHotelMenu();
                 break;
             case 4:
-                ShowOrderDetails();
+                ShowOrderDetailsMenu();
                 break;
             case 5:
                 running = false;
@@ -60,17 +64,39 @@ public class Order
         }}
     }
 
-    public void ShowOrderDetails()
+    public async Task ShowOrderDetailsMenu()
     {
-        Console.WriteLine($"===========================");
-        foreach (Person person in party._persons)
+        bool viewingDetails = true;
+
+        while (viewingDetails)
         {
-            Console.WriteLine($"{person.name}");
+            Console.Clear();
+            Console.WriteLine($"Menu> OrderMenu \n---------------------------");
+            foreach (Person person in party._persons)
+            {
+                Console.WriteLine($"{person.name}");
+            }
+            Console.WriteLine($"Start Date: ");
+            Console.WriteLine($"Destination: ");
+            Console.WriteLine("\n0) Back");
+
+            Console.WriteLine("\nEnter 0 to back: ");
+            string input = Console.ReadLine();
+
+            if (input == "0")
+            {
+                viewingDetails = false; // Exit the details menu
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter '0' to go back.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
         }
-        Console.WriteLine($"Start Date: ");
-        Console.WriteLine($"Destination: ");
     }
     //  Method that produces a list of hotels
+    /*
     public void ShowAllHotels()
     {
         // Get list of hotels from the database
@@ -97,5 +123,5 @@ public class Order
             }
         }
         Console.WriteLine();
-    }
+    }*/
 }
