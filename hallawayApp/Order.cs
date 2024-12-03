@@ -16,7 +16,7 @@ public class Order
         _databaseActions = databaseActions;
     }
 
-    public async Task CreateOrder(int admin)
+    public async Task CreateOrder()
     {
         party = new Party(_databaseActions);
         bool running = true;
@@ -51,7 +51,7 @@ public class Order
                 ShowOrderDetailsMenu();
                 break;
             case 5:
-                _databaseActions.AddOrder(party.partyID, admin, hotel, date, totalPrice);
+                
                 running = false;
                 break;
             case 0:
