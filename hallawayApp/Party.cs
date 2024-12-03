@@ -2,7 +2,7 @@
 namespace hallawayApp;
 public class Party
 {
-    private int partyID;
+    public int partyID;
     private Person _organizer;
     public List<Person> _persons = new List<Person>();
     //private Menu _paryMenu = new Menu();
