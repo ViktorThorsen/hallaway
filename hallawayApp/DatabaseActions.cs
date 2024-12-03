@@ -497,11 +497,22 @@ public class DatabaseActions
         }
     }
 
+    public async Task AddOrder(int partyId, Admin admin, Hotel hotel, DateTime date, double totalPrice)
+    {
+        await using (var cmd = _db.CreateCommand(
+                         " INSERT INTO public.order (party, admin, hotel, date, totalprice) VALUES ($1, $2, $3)"))
+        {
+            cmd.Parameters.AddWithValue(partyId);
+            //cmd.Parameters.AddWithValue();
+        }
+ 
+    }
+
     public async Task<int> GetAddressId(string city, string street)
     {
         int address_id;
         await using (var cmd = _db.CreateCommand(
-                         $"SELECT location_id FROM public.address WHERE city = $1 AND street = $2"))
+                         "SELECT location_id FROM public.address WHERE city = $1 AND street = $2"))
         {
             cmd.Parameters.AddWithValue(city);
             cmd.Parameters.AddWithValue(street);
@@ -514,5 +525,30 @@ public class DatabaseActions
            
         return address_id;
     }
+
+    public async Task<List<Admin>> GetAllAdmin()
+    {
+        var admins = new List<Admin>();
+        await using (var cmd = _db.CreateCommand(
+                         "SELECT admin_id, name, phone, email, date_of_birth FROM public.admin ORDER BY admin_id"))
+        {
+            await using(var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var admin = new Admin(
+                        Name: reader.GetString(reader.GetOrdinal("name")),
+                        phone: reader.GetString(reader.GetOrdinal("phone")),
+                        email: reader.GetString(reader.GetOrdinal("email")),
+                        dateOfBirth: reader.GetDateTime(reader.GetOrdinal("date_of_birth"))
+                        );
+                    admins.Add(admin);
+                }
+            }
+        }
+        
+        return admins;
+    }
+    
     
 }

@@ -5,7 +5,7 @@ public class Party
     private int partyID;
     private Person _organizer;
     public List<Person> _persons = new List<Person>();
-    private Menu _paryMenu = new Menu();
+    //private Menu _paryMenu = new Menu();
     private DatabaseActions _databaseActions;
 
     public Party(DatabaseActions databaseActions)
