@@ -15,9 +15,9 @@ public class DatabaseActions
     // Method that takes int value as id and returns the address as an object
     public async Task<Address> GetAddress(int locationId)
     {
-        await using (var cmd = _db.CreateCommand("SELECT * FROM \"address\" WHERE \"location_id\" = @locationId"))
+        await using (var cmd = _db.CreateCommand("SELECT * FROM \"address\" WHERE \"location_id\" = $1"))
         {
-            cmd.Parameters.AddWithValue("locationId", locationId);
+            cmd.Parameters.AddWithValue(locationId);
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
@@ -82,10 +82,10 @@ public class DatabaseActions
     public async Task<Hotel> GetHotel(string hotelName)
     {
         // Use a parameterized query to avoid SQL injection
-        await using (var cmd = _db.CreateCommand($"SELECT * FROM public.\"hotel\" WHERE \"hotel_name\" = @hotelName"))
+        await using (var cmd = _db.CreateCommand("SELECT * FROM public.\"hotel\" WHERE \"hotel_name\" = $1"))
 
         {
-            cmd.Parameters.AddWithValue("hotelName", hotelName); // Pass the hotel name safely
+            cmd.Parameters.AddWithValue(hotelName); // Pass the hotel name safely
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
