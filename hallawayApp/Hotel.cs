@@ -9,10 +9,10 @@ public class Hotel
     public Rating ratingEnum;
     public bool restaurante;
     public bool kidsClub;
-    private int distanceBeach;
+    public int distanceBeach;
     public int distanceCityCenter;
     public bool eveningEntertainment;
-    private List<Room> roomList;
+    public List<Room> roomList;
     private List<Addon> addonList;
     
     public static List<Hotel> G;

@@ -2,9 +2,9 @@
 
 public class Room
 {
-    private double _price;
-    private int _size;
-    private bool _isAvailable;
+    public double _price;
+    public int _size;
+    public bool _isAvailable;
  
     public Room(double price, int size, bool isAvailable)
     {

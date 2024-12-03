@@ -15,9 +15,9 @@ public class DatabaseActions
     // Method that takes int value as id and returns the address as an object
     public async Task<Address> GetAddress(int locationId)
     {
-        await using (var cmd = _db.CreateCommand("SELECT * FROM \"address\" WHERE \"location_id\" = @locationId"))
+        await using (var cmd = _db.CreateCommand("SELECT * FROM address WHERE location_id = $1"))
         {
-            cmd.Parameters.AddWithValue("locationId", locationId);
+            cmd.Parameters.AddWithValue(locationId);
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
@@ -25,11 +25,13 @@ public class DatabaseActions
                 {
                     
                     // Assuming Address takes two string parameters
+                    Console.WriteLine($"{reader.GetString(1)}");
                     return new Address(reader.GetString(1), reader.GetString(2));
                 }
             }
         }
         // Return null if no row matches the ID
+        Console.WriteLine("RETURN NULL");
         return null;
     }
     
@@ -39,10 +41,10 @@ public class DatabaseActions
         List<Room> rooms = new List<Room>();
 
         // Correctly reference the "room_id" column
-        await using (var cmd = _db.CreateCommand("SELECT * FROM public.\"room\" WHERE \"room_id\" = @roomId"))
+        await using (var cmd = _db.CreateCommand("SELECT * FROM public.room WHERE room_id = $1"))
         {
             // Add parameter for room_id
-            cmd.Parameters.AddWithValue("roomId", roomId);
+            cmd.Parameters.AddWithValue(roomId);
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
@@ -66,14 +68,19 @@ public class DatabaseActions
     public async Task<List<Addon>> GetAddons(int addonId)
     {
         List<Addon> addons = new List<Addon>();
-        await using (var cmd = _db.CreateCommand($"SELECT * FROM public.\"addon\" WHERE \"addon_id\" = @addonId"))
-        await using (var reader = await cmd.ExecuteReaderAsync())
+        await using (var cmd = _db.CreateCommand($"SELECT * FROM public.addon WHERE addon_id = $1"))
         {
-            while (await reader.ReadAsync())
+            cmd.Parameters.AddWithValue(addonId);
+            
+            await using (var reader = await cmd.ExecuteReaderAsync())
             {
-                Addon addon = new Addon(reader.GetString(1), reader.GetString(2), reader.GetDouble(3));
-                addons.Add(addon);
-            }
+                while (await reader.ReadAsync())
+                {
+                    Addon addon = new Addon(reader.GetString(1), reader.GetString(2), reader.GetDouble(3));
+                    addons.Add(addon);
+                }  
+        }
+ 
         }
         return addons;
     }
@@ -82,10 +89,10 @@ public class DatabaseActions
     /*public async Task<Hotel> GetHotel(string hotelName)
     {
         // Use a parameterized query to avoid SQL injection
-        await using (var cmd = _db.CreateCommand($"SELECT * FROM public.\"hotel\" WHERE \"hotel_name\" = @hotelName"))
+        await using (var cmd = _db.CreateCommand("SELECT * FROM public.hotel WHERE hotel_name = $1"))
 
         {
-            cmd.Parameters.AddWithValue("hotelName", hotelName); // Pass the hotel name safely
+            cmd.Parameters.AddWithValue(hotelName); // Pass the hotel name safely
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
@@ -125,7 +132,7 @@ public class DatabaseActions
         {
             // Insert a new empty party and return the auto-generated id
             await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.\"party\" (\"organizer_id\") VALUES (NULL) RETURNING \"id\""))
+                             "INSERT INTO public.party (organizer_id) VALUES (NULL) RETURNING id"))
             {
                 // Execute the command and get the generated id
                 var partyId = (int)await cmd.ExecuteScalarAsync();
@@ -147,11 +154,11 @@ public class DatabaseActions
         {
             // Update the organizer for the given party ID
             await using (var cmd = _db.CreateCommand(
-                             "UPDATE public.\"party\" SET \"organizer_id\" = @organizerId WHERE \"id\" = @partyId"))
+                             "UPDATE public.party SET organizer_id = $1 WHERE id = $2"))
             {
                 // Add parameters for party ID and organizer ID
-                cmd.Parameters.AddWithValue("partyId", partyId);
-                cmd.Parameters.AddWithValue("organizerId", organizerId);
+                cmd.Parameters.AddWithValue(organizerId);
+                cmd.Parameters.AddWithValue(partyId);
 
                 // Execute the query
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -179,12 +186,12 @@ public class DatabaseActions
         try
         {
             await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.\"person_X_party\" (\"person_id\", \"party_id\") " +
-                             "VALUES (@personId, @partyId)"))
+                             "INSERT INTO public.person_X_party (person_id, party_id) " +
+                             "VALUES ($1, $2)"))
             {
                 // Add parameters
-                cmd.Parameters.AddWithValue("personId", personId);
-                cmd.Parameters.AddWithValue("partyId", partyId);
+                cmd.Parameters.AddWithValue(personId);
+                cmd.Parameters.AddWithValue(partyId);
 
                 // Execute the query
                 await cmd.ExecuteNonQueryAsync();
@@ -210,14 +217,14 @@ public class DatabaseActions
 
         // Step 1: Insert the person into the "Person" table
         await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.\"person\" (\"name\", \"phone\", \"email\", \"date_of_birth\") " +
-                             "VALUES (@name, @phone, @email, @dateOfBirth) RETURNING \"user_id\""))
+                             "INSERT INTO public.person (name, phone, email, date_of_birth) " +
+                             "VALUES ($1, $2, $3, $4) RETURNING user_id"))
         {
             // Add parameters
-            cmd.Parameters.AddWithValue("name", person.name);
-            cmd.Parameters.AddWithValue("phone", person.phone);
-            cmd.Parameters.AddWithValue("email", person.email);
-            cmd.Parameters.AddWithValue("dateOfBirth", person.dateOfBirth);
+            cmd.Parameters.AddWithValue(person.name);
+            cmd.Parameters.AddWithValue(person.phone);
+            cmd.Parameters.AddWithValue(person.email);
+            cmd.Parameters.AddWithValue(person.dateOfBirth);
 
             // Execute the query and get the generated ID
             personId = (int)await cmd.ExecuteScalarAsync();
@@ -228,12 +235,12 @@ public class DatabaseActions
 
         // Step 2: Link the person to the party in the "PersonXParty" table
         await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.\"person_X_party\" (\"person_id\", \"party_id\") " +
-                             "VALUES (@personId, @partyId)"))
+                             "INSERT INTO public.person_X_party (person_id, party_id) " +
+                             "VALUES ($1, $2)"))
         {
             // Add parameters
-            cmd.Parameters.AddWithValue("personId", personId);
-            cmd.Parameters.AddWithValue("partyId", partyId);
+            cmd.Parameters.AddWithValue(personId);
+            cmd.Parameters.AddWithValue(partyId);
 
             // Execute the query
             await cmd.ExecuteNonQueryAsync();
@@ -257,11 +264,11 @@ public class DatabaseActions
         {
             // Delete the entry from person_X_party where the user_id and party_id match
             await using (var cmd = _db.CreateCommand(
-                             "DELETE FROM public.\"person_X_party\" WHERE \"person_id\" = @userId AND \"party_id\" = @partyId"))
+                             "DELETE FROM public.person_X_party WHERE person_id = $1 AND party_id = $2"))
             {
                 // Add parameters for the user_id and party_id
-                cmd.Parameters.AddWithValue("userId", userId);
-                cmd.Parameters.AddWithValue("partyId", partyId);
+                cmd.Parameters.AddWithValue(userId);
+                cmd.Parameters.AddWithValue(partyId);
 
                 // Execute the query
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -288,9 +295,9 @@ public class DatabaseActions
         {
             // Delete all entries from person_X_party where the party_id matches
             await using (var cmd = _db.CreateCommand(
-                             "DELETE FROM public.\"person_X_party\" WHERE \"party_id\" = @partyId"))
+                             "DELETE FROM public.person_X_party WHERE party_id = $1"))
             {
-                cmd.Parameters.AddWithValue("partyId", partyId);
+                cmd.Parameters.AddWithValue(partyId);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
                 if (rowsAffected > 0)
@@ -316,8 +323,8 @@ public class DatabaseActions
         try
         {
             await using (var cmd = _db.CreateCommand(
-                             "SELECT \"user_id\", \"name\", \"phone\", \"email\", \"date_of_birth\"" +
-                             "FROM public.\"person\" ORDER BY \"user_id\""))
+                             "SELECT user_id, name, phone, email, date_of_birth" +
+                             "FROM public.person ORDER BY user_id"))
             {
                 await using (var reader = await cmd.ExecuteReaderAsync())
                 {
@@ -350,7 +357,7 @@ public class DatabaseActions
     public async Task<int> GetPersonId(string name)
     {
         int person_id;
-        await using(var cmd = _db.CreateCommand($"SELECT \"user_id\" FROM public.\"person\" WHERE \"name\" = {name}"))
+        await using(var cmd = _db.CreateCommand($"SELECT user_id FROM public.person WHERE name = {name}"))
         await using(var reader = await cmd.ExecuteReaderAsync())
         {
             person_id = reader.GetInt32(0);
@@ -365,15 +372,15 @@ public class DatabaseActions
     {
         // Define the SQL query for inserting a new order
         await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO public.\"order\" (\"party\", \"admin\", \"hotel\", \"date\", \"totalprice\") " +
-                         "VALUES (@partyId, @adminId, @hotelId, @orderDate, @totalPrice)"))
+                         "INSERT INTO public.order (party, admin, hotel, date, totalprice) " +
+                         "VALUES ($1, $2, $3, $4, $5)"))
         {
             // Add parameters to the query
-            cmd.Parameters.AddWithValue("partyId", partyId);       // Foreign key: Party ID
-            cmd.Parameters.AddWithValue("adminId", adminId);       // Foreign key: Admin ID
-            cmd.Parameters.AddWithValue("hotelId", hotelId);       // Foreign key: Hotel ID
-            cmd.Parameters.AddWithValue("orderDate", orderDate);   // Date of the order
-            cmd.Parameters.AddWithValue("totalPrice", totalPrice); // Total price of the order
+            cmd.Parameters.AddWithValue(partyId);       // Foreign key: Party ID
+            cmd.Parameters.AddWithValue(adminId);       // Foreign key: Admin ID
+            cmd.Parameters.AddWithValue(hotelId);       // Foreign key: Hotel ID
+            cmd.Parameters.AddWithValue(orderDate);   // Date of the order
+            cmd.Parameters.AddWithValue(totalPrice); // Total price of the order
 
             // Execute the command
             await cmd.ExecuteNonQueryAsync();
@@ -386,7 +393,7 @@ public class DatabaseActions
     {
         int address_id = await GetAddressId(address.City, address.Street);
         await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO public.\"hotel\" (\"hotel_name\", \"address\", \"pool\", \"resturant\", \"kidsclub\", \"rating\", \"distancebeach\", \"distancecitycenter\", \"evningentertainment\") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"))
+                         "INSERT INTO public.hotel (hotel_name, address, pool, resturant, kidsclub, rating, distancebeach, distancecitycenter, evningentertainment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"))
         {
             cmd.Parameters.AddWithValue(name);
             cmd.Parameters.AddWithValue(address_id);
@@ -409,8 +416,8 @@ public class DatabaseActions
     {
         // Prepare the SQL command to fetch hotel data
         await using (var cmd = _db.CreateCommand(
-            "SELECT \"hotel_id\", \"hotel_name\", \"address\", \"pool\",\"resturant\",\"kidsclub\", \"rating\", \"distancebeach\", " +
-            "\"distancecitycenter\", \"evningentertainment\" FROM \"hotel\" ORDER BY \"hotel_id\""))
+            "SELECT hotel_id, hotel_name, address, pool,resturant,kidsclub, rating, distancebeach, " +
+            "distancecitycenter, evningentertainment FROM hotel ORDER BY hotel_id"))
         {
             // Execute the command and get a data reader
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -467,7 +474,7 @@ public class DatabaseActions
     //add new Room to DB
     public async void AddRoom(double price, int size, bool avalible)
     {
-        await using (var cmd = _db.CreateCommand(" INSERT INTO public.\"room\" (\"price\", \"size\", \"isAvalible\") VALUES ($1, $2, $3)"))
+        await using (var cmd = _db.CreateCommand(" INSERT INTO public.room (price, size, isAvalible) VALUES ($1, $2, $3)"))
         {
             cmd.Parameters.AddWithValue(price);
             cmd.Parameters.AddWithValue(size);
@@ -480,7 +487,7 @@ public class DatabaseActions
     public async void AddAddon(string name, string description, double price, int hotel_id)
     {
         await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO public.\"addon\" (\"name\", \"description\", \"price\", \"hotel\") VALUES ($1, $2, $3, $4)"))
+                         "INSERT INTO public.addon (name, description, price, hotel) VALUES ($1, $2, $3, $4)"))
         {
             cmd.Parameters.AddWithValue(name);
             cmd.Parameters.AddWithValue(description);
@@ -493,11 +500,17 @@ public class DatabaseActions
     public async Task<int> GetAddressId(string city, string street)
     {
         int address_id;
-        await using(var cmd = _db.CreateCommand($"SELECT \"location_id\" FROM public.\"address\" WHERE \"city\" = {city} AND wHERE street = {street}"))
-        await using(var reader = await cmd.ExecuteReaderAsync())
+        await using (var cmd = _db.CreateCommand(
+                         $"SELECT location_id FROM public.address WHERE city = $1 AND street = $2"))
         {
-            address_id = reader.GetInt32(0);
+            cmd.Parameters.AddWithValue(city);
+            cmd.Parameters.AddWithValue(street);
+            await using(var reader = await cmd.ExecuteReaderAsync())
+            {
+                address_id = reader.GetInt32(0);
+            }
         }
+      
            
         return address_id;
     }
