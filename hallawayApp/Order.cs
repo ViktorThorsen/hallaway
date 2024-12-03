@@ -17,7 +17,7 @@ public class Order
         _databaseActions = databaseActions;
     }
 
-    public async Task CreateOrder()
+    public async Task CreateOrder(int admin)
     {
         party = new Party(_databaseActions);
         _hotelManager = new HotelManager(_databaseActions);
@@ -53,6 +53,7 @@ public class Order
                 ShowOrderDetailsMenu();
                 break;
             case 5:
+                _databaseActions.AddOrder(party.partyID, admin, hotel, date, totalPrice);
                 running = false;
                 break;
             case 0:
