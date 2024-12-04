@@ -186,7 +186,7 @@ public class DatabaseActions
         try
         {
             await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.person_X_party (person_id, party_id) " +
+                             "INSERT INTO public.person_x_party (person_id, party_id) " +
                              "VALUES ($1, $2)"))
             {
                 // Add parameters
@@ -235,7 +235,7 @@ public class DatabaseActions
 
         // Step 2: Link the person to the party in the "PersonXParty" table
         await using (var cmd = _db.CreateCommand(
-                             "INSERT INTO public.person_X_party (person_id, party_id) " +
+                             "INSERT INTO public.person_x_party (person_id, party_id) " +
                              "VALUES ($1, $2)"))
         {
             // Add parameters
@@ -264,7 +264,7 @@ public class DatabaseActions
         {
             // Delete the entry from person_X_party where the user_id and party_id match
             await using (var cmd = _db.CreateCommand(
-                             "DELETE FROM public.person_X_party WHERE person_id = $1 AND party_id = $2"))
+                             "DELETE FROM public.person_x_party WHERE person_id = $1 AND party_id = $2"))
             {
                 // Add parameters for the user_id and party_id
                 cmd.Parameters.AddWithValue(userId);
@@ -295,7 +295,7 @@ public class DatabaseActions
         {
             // Delete all entries from person_X_party where the party_id matches
             await using (var cmd = _db.CreateCommand(
-                             "DELETE FROM public.person_X_party WHERE party_id = $1"))
+                             "DELETE FROM public.person_x_party WHERE party_id = $1"))
             {
                 cmd.Parameters.AddWithValue(partyId);
 
@@ -323,8 +323,7 @@ public class DatabaseActions
         try
         {
             await using (var cmd = _db.CreateCommand(
-                             "SELECT user_id, name, phone, email, date_of_birth" +
-                             "FROM public.person ORDER BY user_id"))
+                             "SELECT user_id, name, phone, email, date_of_birth FROM public.person ORDER BY user_id"))
             {
                 await using (var reader = await cmd.ExecuteReaderAsync())
                 {
@@ -497,11 +496,25 @@ public class DatabaseActions
         }
     }
 
+    public async Task AddOrder(int partyId,int adminId, Hotel hotel, DateTime date, double totalPrice)
+    {
+        await using (var cmd = _db.CreateCommand(
+                         " INSERT INTO public.order (party, admin, hotel, date, totalprice) VALUES ($1, $2, $3, $4, $5)"))
+        {
+            cmd.Parameters.AddWithValue(partyId);
+            cmd.Parameters.AddWithValue(adminId);
+            cmd.Parameters.AddWithValue(hotel.hotelID);
+            cmd.Parameters.AddWithValue(date);
+            cmd.Parameters.AddWithValue(totalPrice);
+        }
+ 
+    }
+
     public async Task<int> GetAddressId(string city, string street)
     {
         int address_id;
         await using (var cmd = _db.CreateCommand(
-                         $"SELECT location_id FROM public.address WHERE city = $1 AND street = $2"))
+                         "SELECT location_id FROM public.address WHERE city = $1 AND street = $2"))
         {
             cmd.Parameters.AddWithValue(city);
             cmd.Parameters.AddWithValue(street);
@@ -514,5 +527,30 @@ public class DatabaseActions
            
         return address_id;
     }
+
+    public async Task<List<Admin>> GetAllAdmin()
+    {
+        var admins = new List<Admin>();
+        await using (var cmd = _db.CreateCommand(
+                         "SELECT admin_id, name, phone, email, date_of_birth FROM public.admin ORDER BY admin_id"))
+        {
+            await using(var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var admin = new Admin(
+                        Name: reader.GetString(reader.GetOrdinal("name")),
+                        phone: reader.GetString(reader.GetOrdinal("phone")),
+                        email: reader.GetString(reader.GetOrdinal("email")),
+                        dateOfBirth: reader.GetDateTime(reader.GetOrdinal("date_of_birth"))
+                        );
+                    admins.Add(admin);
+                }
+            }
+        }
+        
+        return admins;
+    }
+    
     
 }
