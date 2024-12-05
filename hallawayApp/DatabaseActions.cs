@@ -496,15 +496,16 @@ public class DatabaseActions
         }
     }
 
-    public async Task AddOrder(int partyId,int adminId, Hotel hotel, DateTime date, double totalPrice)
+    public async Task AddOrder(int partyId,int adminId, Hotel hotel, DateTime start_date, DateTime end_date, double totalPrice)
     {
         await using (var cmd = _db.CreateCommand(
-                         " INSERT INTO public.order (party, admin, hotel, date, totalprice) VALUES ($1, $2, $3, $4, $5)"))
+                         " INSERT INTO public.order (party, admin, hotel, start_date, end_date totalprice) VALUES ($1, $2, $3, $4, $5, $6)"))
         {
             cmd.Parameters.AddWithValue(partyId);
             cmd.Parameters.AddWithValue(adminId);
             cmd.Parameters.AddWithValue(hotel.hotelID);
-            cmd.Parameters.AddWithValue(date);
+            cmd.Parameters.AddWithValue(start_date);
+            cmd.Parameters.AddWithValue(end_date);
             cmd.Parameters.AddWithValue(totalPrice);
         }
  

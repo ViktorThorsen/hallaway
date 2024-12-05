@@ -7,7 +7,9 @@ public class Order
     private HotelManager _hotelManager;
     private Admin admin;
     private Hotel hotel;
-    private DateTime date;
+    private DatePicker _datePicker;
+    private DateTime start_date;
+    private DateTime end_date;
     private double totalPrice;
     private List<Addon> addonList;
     private DatabaseActions _databaseActions;
@@ -21,6 +23,7 @@ public class Order
     {
         party = new Party(_databaseActions);
         _hotelManager = new HotelManager(_databaseActions);
+        _datePicker = new DatePicker();
         bool running = true;
 
         while (running){ 
@@ -44,7 +47,9 @@ public class Order
                 await party.PartyMenu();
                 break;
             case 2:
-                // Pick a date
+                var (startDate, endDate) = _datePicker.PickDateRange();
+                start_date = startDate;
+                end_date = endDate;
                 break;
             case 3:
                 await _hotelManager.FindHotelMenu();
@@ -53,7 +58,7 @@ public class Order
                 ShowOrderDetailsMenu();
                 break;
             case 5:
-                _databaseActions.AddOrder(party.partyID, admin, hotel, date, totalPrice);
+                _databaseActions.AddOrder(party.partyID, admin, hotel, start_date, end_date, totalPrice);
                 running = false;
                 break;
             case 0:
@@ -73,11 +78,13 @@ public class Order
         {
             Console.Clear();
             Console.WriteLine($"Menu> OrderMenu \n---------------------------");
+            Console.WriteLine($"Persons in Party: ");
             foreach (Person person in party._persons)
             {
                 Console.WriteLine($"{person.name}");
             }
-            Console.WriteLine($"Start Date: ");
+            Console.WriteLine($"Start Date: {start_date}");
+            Console.WriteLine($"Start Date: {end_date}");
             Console.WriteLine($"Destination: ");
             Console.WriteLine("\n0) Back");
 
