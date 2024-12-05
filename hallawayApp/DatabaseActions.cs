@@ -65,7 +65,7 @@ public class DatabaseActions
     }
     
     // Method that takes int value as id and returns a list with addons
-    public async Task<List<Addon>> GetAddons(int addonId)
+    /*public async Task<List<Addon>> GetAddons(int addonId)
     {
         List<Addon> addons = new List<Addon>();
         await using (var cmd = _db.CreateCommand($"SELECT * FROM public.addon WHERE addon_id = $1"))
@@ -83,7 +83,7 @@ public class DatabaseActions
  
         }
         return addons;
-    }
+    }*/
     
     // Method that reads all the hotels from the database and returns them as objects
     /*public async Task<Hotel> GetHotel(string hotelName)
@@ -553,5 +553,43 @@ public class DatabaseActions
         return admins;
     }
     
-    
+    public async Task<List<Addon>> GetAddons(int hotelId)
+    {
+        var addons = new List<Addon>();
+        try
+        {
+            // Prepare the SQL command to fetch hotel data
+            await using (var cmd = _db.CreateCommand(
+                             "SELECT * FROM addon JOIN addon_x_hotel ON addon.addon_id = addon_x_hotel.addon_id WHERE hotel_id = $1"))
+            {
+                // Execute the command and get a data reader
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        // Extract data from each column
+                        int addonID = reader.GetInt32(reader.GetOrdinal("addon_id"));
+                        string name = reader.GetString(reader.GetOrdinal("name"));
+                        string description = reader.GetString(reader.GetOrdinal("description"));                    
+                        double price = reader.GetDouble(reader.GetOrdinal("price"));
+            
+                        // Create a new Addon object
+                        var addon = new Addon(
+                            name: name,
+                            description: description,
+                            price: price
+                        );
+                        addons.Add(addon);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while fetching addons: {ex.Message}");
+            // Handle or log the exception as necessary
+        }
+
+        return addons;
+    }
 }

@@ -2,6 +2,7 @@
 
 public class Addon
 {
+    public int addonID;
     public string name;
     public string description;
     public double price;
