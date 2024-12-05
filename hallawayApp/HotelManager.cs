@@ -19,13 +19,13 @@ public class HotelManager
             Console.WriteLine(
                 $"Menu> OrderMenu> DestinationMenu" +
                 $"\n---------------------------" +
-                $"\n1) Show all hotels \n2) Filter on city\n0) Return");
+                $"\n1) Show all hotels \n2) Filter on city \n3) Select hotel\n0) Return");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
 
             if (!int.TryParse(input, out int choice))
             {
-                Console.WriteLine("Invalid input. Please enter a number between 0 and 2.");
+                Console.WriteLine("Invalid input. Please enter a number between 0 and 3.");
                 continue;
             }
 
@@ -38,6 +38,7 @@ public class HotelManager
                     SelectCity();
                     break;
                 case 3:
+                    SelectHotel(); 
                     break;
                 case 0:
                     running = false; // Exit the menu loop
@@ -545,6 +546,7 @@ public class HotelManager
                 $"\n11) Evening entertainment" +
                 $"\n\t20) Print filtered hotels" +
                 $"\n\t21) Remove filters" +
+                $"\n\t22) Select hotel " +
                 $"\n\t0) Exit");
 
             int choice = Int32.Parse(Console.ReadLine());
@@ -588,6 +590,9 @@ public class HotelManager
                     break;
                 case 21:
                     ClearFilteredHotels();
+                    break;
+                case 22:
+                    SelectHotel();
                     break;
                 case 0:
                     running = false;
@@ -642,4 +647,36 @@ public class HotelManager
             }
         }
     }
+    private async Task<Hotel> SelectHotel()
+    {
+        bool running = true;
+        while (running)
+        {
+            Console.WriteLine("Enter a hotel id to select hotel: ");
+            int selectedHotelId = Int32.Parse(Console.ReadLine());
+            foreach (var hotel in filteredHotels)
+            {
+                if (hotel.hotelID == selectedHotelId)
+                {
+                    Console.WriteLine($"Do you wish to select: {hotel.hotelName} \n1) Yes\n2) No");
+                    int input = Int32.Parse(Console.ReadLine());
+                    switch (input)
+                    {
+                        case 1:
+                            return hotel;
+                            break;
+                        case 2:
+                            return null;
+                            running = false;
+                            break;
+                        default:
+                            Console.WriteLine("Please enter a valid input");
+                            break;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
 }
