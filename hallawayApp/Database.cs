@@ -9,7 +9,7 @@ public class Database
     private readonly string _host = "localhost";
     private readonly string _port = "5432";
     private readonly string _username = "postgres";
-    private readonly string _password = "admin132";
+    private readonly string _password = "Dragonsdogma01";
     private readonly string _database = "hallawaydb";
 
     private NpgsqlDataSource _connection;

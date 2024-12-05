@@ -16,10 +16,11 @@ public class HotelManager
         _databaseActions = databaseActions;
     }
 
-    public async Task FindHotelMenu()
+    public async Task<Hotel> FindHotelMenu()
     {
         bool running = true;
         hotelList = await _databaseActions.GetAllHotels();
+        Hotel selectedHotel = null;
 
         while (running)
         {
@@ -41,7 +42,11 @@ public class HotelManager
             switch (choice)
             {
                 case 1:
-                    ShowHotels();
+                    selectedHotel = ShowHotels();
+                    if (selectedHotel != null)
+                    {
+                        return selectedHotel;
+                    }
                     break;
                 case 2:
                     city = FilterOnCity();
@@ -66,9 +71,10 @@ public class HotelManager
                     break;
             }
         }
+        return null; // Return null if no hotel is selected
     }
 
-    private void ShowHotels()
+    private Hotel ShowHotels()
     {
         Console.Clear();
 
@@ -82,6 +88,7 @@ public class HotelManager
         if (!filteredHotels.Any())
         {
             Console.WriteLine("No hotels match the current filters.");
+            return null;
         }
         else
         {
@@ -89,10 +96,17 @@ public class HotelManager
             {
                 Console.WriteLine($"{hotel.hotelID}) {hotel.hotelName} - City: {hotel.address.City}, Distance to beach: {hotel.distanceBeach} meters, Rating: {hotel.ratingEnum}, Pool: {hotel.pool}");
             }
-        }
-
-        Console.WriteLine("\nPress enter to continue");
-        Console.ReadLine();
+        } 
+        Console.WriteLine("\nEnter hotel id or leave empty to return: "); 
+        string input = Console.ReadLine();
+        if (!int.TryParse(input, out int id))
+        {
+            Console.WriteLine("Invalid input. Please enter a valid number."); return null;
+        } 
+        var selectedHotel = filteredHotels.FirstOrDefault(hotel => hotel.hotelID == id); 
+        if (selectedHotel == null) 
+        { Console.WriteLine("No hotel found with the given ID."); } 
+        return selectedHotel;
     }
 
     public string FilterOnCity()
