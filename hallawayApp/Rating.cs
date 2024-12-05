@@ -2,7 +2,9 @@
 
 public enum Rating
 {
-    One = 1,
-    Two = 2,
-    Three = 3
+    One_Star = 1,
+    Two_Stars = 2,
+    Three_Stars = 3,
+    Four_Stars = 4,
+    Five_Stars = 5
 }

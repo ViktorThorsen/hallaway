@@ -416,7 +416,7 @@ public class DatabaseActions
         // Prepare the SQL command to fetch hotel data
         await using (var cmd = _db.CreateCommand(
             "SELECT hotel_id, hotel_name, address, pool,resturant,kidsclub, rating, distancebeach, " +
-            "distancecitycenter, evningentertainment FROM hotel ORDER BY hotel_id"))
+            "distancecitycenter, eveningentertainment FROM hotel ORDER BY hotel_id"))
         {
             // Execute the command and get a data reader
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -434,7 +434,7 @@ public class DatabaseActions
                     Rating rating = (Rating)dbRating;
                     int distancebeach = reader.GetInt32(reader.GetOrdinal("distancebeach"));
                     int distanceCityCenter = reader.GetInt32(reader.GetOrdinal("distancecitycenter"));
-                    bool eveningEntertainment = reader.GetBoolean(reader.GetOrdinal("evningentertainment"));
+                    bool eveningEntertainment = reader.GetBoolean(reader.GetOrdinal("eveningentertainment"));
 
                     // Fetch related data
                     Address address = await GetAddress(addressId); // Retrieve address based on ID

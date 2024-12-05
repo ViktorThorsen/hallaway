@@ -4,7 +4,7 @@ public class HotelManager
 {
     private DatabaseActions _databaseActions;
     private List<Hotel> hotelList;
-    private List<Hotel> filteredHotels;
+    private List<Hotel> filteredHotels = new List<Hotel>();
     public HotelManager(DatabaseActions databaseActions)
     {
         _databaseActions = databaseActions;
@@ -17,15 +17,15 @@ public class HotelManager
         {
             Console.Clear();
             Console.WriteLine(
-                $"Menu> OrderMenu> PartyMenu" +
+                $"Menu> OrderMenu> DestinationMenu" +
                 $"\n---------------------------" +
-                $"\n1) Show all hotels \n2) Filter on city \n4) Done \n0) Quit");
+                $"\n1) Show all hotels \n2) Filter on city\n0) Return");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
 
             if (!int.TryParse(input, out int choice))
             {
-                Console.WriteLine("Invalid input. Please enter a number between 0 and 4.");
+                Console.WriteLine("Invalid input. Please enter a number between 0 and 2.");
                 continue;
             }
 
@@ -35,13 +35,11 @@ public class HotelManager
                     ShowHotels();
                     break;
                 case 2: 
-                    SelectFilter();
+                    SelectCity();
                     break;
-                case 3: 
+                case 3:
                     break;
                 case 0:
-                    Console.WriteLine("Goodbye!");
-                 
                     running = false; // Exit the menu loop
                     break;
                 default:
@@ -53,19 +51,22 @@ public class HotelManager
 
     private void ShowHotels()
     {
+        Console.Clear();
         foreach (Hotel hotel in hotelList)
         {
-            Console.WriteLine($"{hotel.hotelName}");
+            Console.WriteLine($"{hotel.hotelID}) {hotel.hotelName}");
         }
-
+        Console.WriteLine("Press enter to continue");
         Console.ReadLine();
     }
     
-    private void FilterOnCity()
+    private void FilterOnCity(string city)
     {
-        Console.Clear();
-        Console.WriteLine($"Please enter a city to search in: ");
-        string city = Console.ReadLine();
+        GetFilteredHotels();
+        foreach (var hotel in filteredHotels)
+        {
+            Console.WriteLine($"{hotel.hotelName}");
+        }
         if (filteredHotels.Any(hotel => hotel.address.City == city))
         {
             var hotelsToRemove = new List<Hotel>();
@@ -79,8 +80,8 @@ public class HotelManager
             foreach (var hotel in hotelsToRemove)
             {
                 filteredHotels.Remove(hotel); 
-                
             }
+            SelectFilter();
         }
     }
     private void FilterOnDistanceBeach()
@@ -88,7 +89,7 @@ public class HotelManager
         Console.Clear();
         Console.WriteLine($"Please enter a max distance to the beach: ");
         int distance = Int32.Parse(Console.ReadLine());
-        if (filteredHotels.Any(hotel => hotel.distanceBeach <= distance))
+        if (filteredHotels.Any(hotel => hotel.distanceBeach >= distance))
         {
             var hotelsToRemove = new List<Hotel>();
             foreach (var hotel in filteredHotels)
@@ -113,7 +114,7 @@ public class HotelManager
     private void FilterOnRoomSize()
     {
         int desiredSize = Int32.Parse(Console.ReadLine());
-        if (filteredHotels.Any(hotel => hotel.roomList.Any(room => room._size <= desiredSize)))
+        if (filteredHotels.Any(hotel => hotel.roomList.Any(room => room._size >= desiredSize)))
         {
             var hotelsToRemove = new List<Hotel>();
             foreach (var hotel in filteredHotels)
@@ -350,9 +351,128 @@ public class HotelManager
         }
     }
     
+    /*
+    // Bubblesort for hotels rating
+    private void SortHotelRatingAsc()
+    {
+        int first = 0;
+        int lastHotel = filteredHotels.Count() - 1;
+        for (int i = 0; i < lastHotel; i++)
+        {
+            int hotelsLeft = lastHotel - i;
+            int lastRoom = filteredHotels[i].roomList[i].Count() - 1;
+
+            for (int j = 0; j < hotelsLeft; j++)
+            {
+                int roomsLeft = 
+                for (int k = 0; k < )
+            }
+
+            foreach (var hotel in filteredHotels)
+            {
+                foreach (var room in hotel.roomList)
+                {
+                    if (room._price < hotel.roomList.IndexOf(room) + 1)
+                    {
+                        
+                    }
+                }
+            }
+        }
+    }
+    
+    // Bubblesort for hotels rating
+    private void SortHotelRatingDesc()
+    {
+        int first = 0;
+        int last = filteredHotels.Count() - 1;
+        for (int i = 0; i < last; i++)
+        {
+            int toSort = last - i;
+
+            for (int j = 0; j < toSort; j++)
+            {
+                if (filteredHotels[j].ratingEnum < filteredHotels[j + 1].ratingEnum)
+                {
+                    Hotel temp = filteredHotels[j];
+                    filteredHotels[j] = filteredHotels[j + 1];
+                    filteredHotels[j + 1] = temp;
+                }
+            }
+        }
+    }*/
+    
+    // Bubblesort for hotels rating
+    private void SortHotelPriceAsc()
+    {
+        int first = 0;
+        int last = filteredHotels.Count() - 1;
+        for (int i = 0; i < last; i++)
+        {
+            int toSort = last - i;
+
+            for (int j = 0; j < toSort; j++)
+            {
+                if (filteredHotels[j].ratingEnum > filteredHotels[j + 1].ratingEnum)
+                {
+                    Hotel temp = filteredHotels[j];
+                    filteredHotels[j] = filteredHotels[j + 1];
+                    filteredHotels[j + 1] = temp;
+                }
+            }
+        }
+    }
+    
+    // Bubblesort for hotels rating
+    private void SortHotelPriceDesc()
+    {
+        int first = 0;
+        int last = filteredHotels.Count() - 1;
+        for (int i = 0; i < last; i++)
+        {
+            int toSort = last - i;
+
+            for (int j = 0; j < toSort; j++)
+            {
+                if (filteredHotels[j].ratingEnum < filteredHotels[j + 1].ratingEnum)
+                {
+                    Hotel temp = filteredHotels[j];
+                    filteredHotels[j] = filteredHotels[j + 1];
+                    filteredHotels[j + 1] = temp;
+                }
+            }
+        }
+    }
+    private void SortRatingMenu()
+    {
+        bool running = true;
+        while (running)
+        {
+            Console.Clear();
+            Console.WriteLine($"Sort hotels on ratings: \n1)Ascending \n2)Descending \n0) Cancel");
+            int input = Int32.Parse(Console.ReadLine());
+
+            switch (input)
+            {
+                case 1:
+                    SortHotelPriceAsc();
+                    break;
+                case 2:
+                    SortHotelPriceDesc();
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    Console.WriteLine("Please enter a valid input");
+                    break;
+            }
+        }
+    }
+    
     private void GetFilteredHotels()
     {
-        foreach (var hotel in hotelList)
+        foreach (Hotel hotel in hotelList)
         {
             filteredHotels.Add(hotel);
         }
@@ -373,48 +493,56 @@ public class HotelManager
 
     private void ShowFilteredHotels()
     {
-        foreach (var hotel in filteredHotels)
+        Console.Clear();
+        if (filteredHotels.Count() != null)
         {
-            Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
-                              $"\n\taddress: {hotel.address.Street} " +
-                              $"\n\tpool: {hotel.pool} " +
-                              $"\n\trestaurant: {hotel.restaurante}" +
-                              $"\n\tkid's club: {hotel.kidsClub}" +
-                              $"\n\trating: {hotel.ratingEnum} stars" +
-                              $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
-                              $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
-                              $"\n\tevening entertainment: {hotel.eveningEntertainment}");
-            foreach (var room in hotel.roomList)
+            foreach (var hotel in filteredHotels)
             {
-                Console.WriteLine($"\nsize: {room._size}m2" +
-                                  $"\nAvailable: {room._isAvailable}" +
-                                  $"\n\n\tprice: {room._price}kr");
+                Console.WriteLine($"\n{hotel.hotelID}) {hotel.hotelName} " +
+                                  $"\n\taddress: {hotel.address.Street} " +
+                                  $"\n\tpool: {hotel.pool} " +
+                                  $"\n\trestaurant: {hotel.restaurante}" +
+                                  $"\n\tkid's club: {hotel.kidsClub}" +
+                                  $"\n\trating: {hotel.ratingEnum} stars" +
+                                  $"\n\tdistance to the beach: {hotel.distanceBeach}m" +
+                                  $"\n\tdistance to the city center: {hotel.distanceCityCenter}m" +
+                                  $"\n\tevening entertainment: {hotel.eveningEntertainment}");
+                foreach (var room in hotel.roomList)
+                {
+                    Console.WriteLine($"\nsize: {room._size}m2" +
+                                      $"\nAvailable: {room._isAvailable}" +
+                                      $"\n\n\tprice: {room._price}kr");
+                }
             }
+            Console.Write("Press enter to continue");
+            Console.ReadLine();
         }
-        Console.Write("Press enter to continue");
-        Console.ReadLine();
+        else
+        {
+            Console.WriteLine("There are no hotels matching your search :(");
+        }
     }
     
 
     private void SelectFilter()
     {
-        GetFilteredHotels();
         bool running = true;
         while (running)
         {
+            Console.Clear();
             Console.WriteLine(
-                $"\n1) City" +
-                $"\n2) Distance beach" +
-                $"\n3) Room size" +
-                $"\n4) City" +
-                $"\n5) Price" +
-                $"\n6) Available" +
-                $"\n7) Kids club" +
-                $"\n8) Pool" +
-                $"\n9) Restaurant" +
-                $"\n10) Rating" +
-                $"\n11) Distance city center" +
-                $"\n12) Evening entertainment" +
+                $"Filter Hotels" +
+                $"\n1) Distance beach" +
+                $"\n2) Room size" +
+                $"\n3) City" +
+                $"\n4) Price" +
+                $"\n5) Available" +
+                $"\n6) Kids club" +
+                $"\n7) Pool" +
+                $"\n8) Restaurant" +
+                $"\n9) Rating" +
+                $"\n10) Distance city center" +
+                $"\n11) Evening entertainment" +
                 $"\n\t20) Print filtered hotels" +
                 $"\n\t21) Remove filters" +
                 $"\n\t0) Exit");
@@ -423,49 +551,93 @@ public class HotelManager
             switch (choice)
             {
                 case 1:
-                    FilterOnCity();
-                    break;
-                case 2:
                     FilterOnDistanceBeach();
                     break;
-                case 3:
+                case 2:
                     FilterOnRoomSize();
                     break;
-                case 4:
+                case 3:
                     FilterOnPrice();
                     break;
-                case 5:
+                case 4:
                     FilterOnIsAvailable();
                     break;
-                case 6:
+                case 5:
                     FilterOnKidsClub();                
                     break;
-                case 7:
+                case 6:
                     FilterOnKidsClub();
                     break;
-                case 8:
+                case 7:
                     FilterOnPool();
                     break;
-                case 9:
+                case 8:
                     FilterOnRestaurant();
                     break;
-                case 10:
-                    FilterOnRating();
+                case 9:
+                    SortRatingMenu();
                     break;
-                case 11: 
+                case 10: 
                     FilterOnDistanceCityCenter();
                     break;
-                case 12:
+                case 11:
                     FilterOnEveningEntertainment();
                     break;
                 case 20:
-                    GetFilteredHotels();
+                    ShowFilteredHotels();
                     break;
                 case 21:
                     ClearFilteredHotels();
                     break;
                 case 0:
                     running = false;
+                    break;
+            }
+        }
+    }
+
+    private void SelectCity()
+    {
+        bool running = true;
+        while (running)
+        {
+            Console.Clear();
+            Console.WriteLine($"Select a city to search for hotels" +
+                              $"\n1) Falkenberg" +
+                              $"\n2) Halmstad" +
+                              $"\n3) Hyltebruk" +
+                              $"\n4) Laholm" +
+                              $"\n5) Kungsbacka" +
+                              $"\n6) Varberg" +
+                              $"\n0) Quit");
+            int input = Int32.Parse(Console.ReadLine());
+            switch (input)
+            {
+                case 1:
+                    FilterOnCity("Falkenberg");
+                    break;
+                case 2:
+                    FilterOnCity("Halmstad");
+                    break;
+                case 3:
+                    FilterOnCity("Hyltebruk");
+                    break;
+                case 4:
+                    FilterOnCity("Laholm");
+                    break;
+                case 5:
+                    FilterOnCity("Kungsbacka");
+                    break;
+                case 6:
+                    FilterOnCity("Varberg");
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    Console.Clear();
+                    Console.WriteLine("Please enter a valid input \nPress enter to continue");
+                    Console.ReadLine();
                     break;
             }
         }
