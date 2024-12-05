@@ -392,7 +392,7 @@ public class DatabaseActions
     {
         int address_id = await GetAddressId(address.City, address.Street);
         await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO public.hotel (hotel_name, address, pool, resturant, kidsclub, rating, distancebeach, distancecitycenter, evningentertainment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"))
+                         "INSERT INTO public.hotel (hotel_name, address, pool, resturant, kidsclub, rating, distancebeach, distancecitycenter, eveningentertainment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"))
         {
             cmd.Parameters.AddWithValue(name);
             cmd.Parameters.AddWithValue(address_id);
@@ -416,7 +416,7 @@ public class DatabaseActions
         // Prepare the SQL command to fetch hotel data
         await using (var cmd = _db.CreateCommand(
             "SELECT hotel_id, hotel_name, address, pool,resturant,kidsclub, rating, distancebeach, " +
-            "distancecitycenter, evningentertainment FROM hotel ORDER BY hotel_id"))
+            "distancecitycenter, eveningentertainment FROM hotel ORDER BY hotel_id"))
         {
             // Execute the command and get a data reader
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -434,7 +434,7 @@ public class DatabaseActions
                     Rating rating = (Rating)dbRating;
                     int distancebeach = reader.GetInt32(reader.GetOrdinal("distancebeach"));
                     int distanceCityCenter = reader.GetInt32(reader.GetOrdinal("distancecitycenter"));
-                    bool eveningEntertainment = reader.GetBoolean(reader.GetOrdinal("evningentertainment"));
+                    bool eveningEntertainment = reader.GetBoolean(reader.GetOrdinal("eveningentertainment"));
 
                     // Fetch related data
                     Address address = await GetAddress(addressId); // Retrieve address based on ID

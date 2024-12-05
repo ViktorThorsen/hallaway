@@ -31,6 +31,7 @@ public class Order
                           $"\n1) Manage party " +
                           $"\n2) Set date " +
                           $"\n3) Select destination " +
+                          $"\n33) Addons " +
                           $"\n4) View details " +
                           $"\n5) Done " +
                           $"\n0) Quit");
@@ -49,6 +50,10 @@ public class Order
             case 3:
                 await _hotelManager.FindHotelMenu();
                 break;
+            case 33:
+            
+            
+            
             case 4:
                 ShowOrderDetailsMenu();
                 break;

@@ -10,6 +10,6 @@ public class Addon
     {
         this.name = name;
         this.description = description;
-        this.price = price;
+        this.price = price; 
     }
 }

@@ -44,7 +44,8 @@ public class HotelManager
                     running = false; // Exit the menu loop
                     break;
                 case 10:
-                    SelectHotels(1);
+                    // SelectHotels(1); 
+                    
                     
                     break;
                 case 11:
@@ -77,6 +78,7 @@ public class HotelManager
     }
 
     private void ShowHotels()
+    
     {
         foreach (Hotel hotel in hotelList)
         {
@@ -86,7 +88,7 @@ public class HotelManager
         Console.ReadLine();
     }
 
-    private void SelectHotels(int index)
+    /*private void SelectHotels(int index)
     {
         foreach (var hotel in hotelList)
         {
@@ -101,7 +103,7 @@ public class HotelManager
                 Console.WriteLine("No available hotels");
             }
         }
-    }
+    }*/
 }
         
         
