@@ -7,8 +7,9 @@ public class Addon
     public string description;
     public double price;
  
-    public Addon(string name, string description, double price)
+    public Addon(int addonID, string name, string description, double price)
     {
+        this.addonID = addonID;
         this.name = name;
         this.description = description;
         this.price = price;

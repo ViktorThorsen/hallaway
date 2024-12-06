@@ -551,7 +551,7 @@ public class DatabaseActions
         {
             // Prepare the SQL command to fetch hotel data
             await using (var cmd = _db.CreateCommand(
-                             "SELECT * FROM addon JOIN addon_x_hotel ON addon.addon_id = addon_x_hotel.addon_id WHERE hotel_id = $1"))
+                             "SELECT * FROM addon JOIN addon_x_hotel ON addon.addon_id = addon_x_hotel.addon_id WHERE hotel_id = $1 ORDER BY hotel_id"))
             {
                 cmd.Parameters.AddWithValue(hotelId);
                 // Execute the command and get a data reader
@@ -567,6 +567,7 @@ public class DatabaseActions
             
                         // Create a new Addon object
                         var addon = new Addon(
+                            addonID: addonID,
                             name: name,
                             description: description,
                             price: price
