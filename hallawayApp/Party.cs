@@ -5,7 +5,6 @@ public class Party
     public int partyID;
     private Person _organizer;
     public List<Person> _persons = new List<Person>();
-    //private Menu _paryMenu = new Menu();
     private DatabaseActions _databaseActions;
 
     public Party(DatabaseActions databaseActions)
@@ -20,6 +19,116 @@ public class Party
         Console.WriteLine($"Empty party created with Party ID: {id}");
         return id;
     }
+    
+    public async Task PartyMenu()
+{
+    bool running = true;
+
+    while (running)
+    {
+        Console.Clear();
+
+        string organizerMessage = _organizer != null ? _organizer.name : "(NOT set)";
+        string personsMessage = _persons.Count > 0 ? $"({_persons.Count} person(s))" : "(No members yet)";
+
+        Console.WriteLine(
+            $"Menu> OrderMenu> PartyMenu" +
+            $"\n---------------------------" +
+            $"\n1) Set Organizer {organizerMessage}" +
+            $"\n2) Add Party Members {personsMessage}" +
+            $"\n3) Remove a Party Member" +
+            $"\n4) View Party Details" +
+            $"\n5) Done" +
+            $"\n0) Cancel and Clear Party");
+        Console.WriteLine("\nEnter your choice: ");
+
+        string input = Console.ReadLine();
+
+        if (!int.TryParse(input, out int choice))
+        {
+            Console.WriteLine("Invalid input. Please enter a number between 0 and 5.");
+            Console.WriteLine("Press Enter to continue...");
+            Console.ReadLine();
+            continue;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                await SetOrganizer();
+                break;
+
+            case 2:
+                if (_organizer == null)
+                {
+                    Console.WriteLine("You must set the organizer before adding party members.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    await AddPartyMembers();
+                }
+                break;
+
+            case 3:
+                if (_persons.Count > 0)
+                {
+                    await DeletePerson();
+                }
+                else
+                {
+                    Console.WriteLine("There are no party members to remove.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                }
+                break;
+
+            case 4:
+                ViewPartyDetails();
+                break;
+
+            case 5:
+                if (_organizer == null)
+                {
+                    Console.WriteLine("You must set the organizer before completing the party.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    Console.WriteLine("Party setup is complete!");
+                    running = false;
+                }
+                break;
+
+            case 0:
+                Console.WriteLine("Are you sure you want to cancel and clear the party? (yes/no)");
+                string confirm = Console.ReadLine()?.ToLower();
+                if (confirm == "yes")
+                {
+                    await _databaseActions.RemoveAllPersonsFromParty(partyID);
+                    _persons.Clear();
+                    _organizer = null;
+                    Console.WriteLine("Party cleared. Returning to the previous menu.");
+                    running = false;
+                }
+                else
+                {
+                    Console.WriteLine("Party was not cleared. Returning to the menu...");
+                }
+                Console.WriteLine("Press Enter to continue...");
+                Console.ReadLine();
+                break;
+
+            default:
+                Console.WriteLine("Invalid option. Please choose a valid menu option.");
+                Console.WriteLine("Press Enter to continue...");
+                Console.ReadLine();
+                break;
+        }
+    }
+}
     
     private async Task AddPerson()
     {
@@ -41,7 +150,7 @@ public class Party
         if (PersonExists(person, personsInDatabase))
         {
             Console.WriteLine($"A person with the same details already exists in the database.");
-            return; // Exit without adding the person
+            return;
         }
         
         
@@ -54,7 +163,6 @@ public class Party
         }
         
         Console.WriteLine($"{name} was added to the party");
-        //Add This to Database
     }
     private bool PersonExists(Person newPerson, List<Person> personsInDatabase)
     {
@@ -65,10 +173,10 @@ public class Party
                 person.email == newPerson.email &&
                 person.dateOfBirth == newPerson.dateOfBirth)
             {
-                return true; // The person already exists
+                return true;
             }
         }
-        return false; // No matching person found
+        return false;
     }
 
     private void DisplayAllPersons()
@@ -91,13 +199,12 @@ public class Party
     if (personsInDataBase.Count == 0)
     {
         Console.WriteLine("No persons found in the database.");
-        return; // Exit if there are no persons
+        return;
     }
     Console.Clear();
     Console.WriteLine($"Menu> OrderMenu> PartyMenu" +
                       $"\n---------------------------"); 
-
-    // Split the persons into two columns
+    
     int halfCount = (personsInDataBase.Count + 1) / 2;
 
     for (int i = 0; i < halfCount; i++)
@@ -105,7 +212,7 @@ public class Party
         string firstColumn = $"{i + 1}) {personsInDataBase[i].name}";
         string secondColumn = (i + halfCount < personsInDataBase.Count)
             ? $"{i + 1 + halfCount}) {personsInDataBase[i + halfCount].name}"
-            : ""; // Handle the case when the number of persons is odd
+            : "";
         Console.WriteLine($"{firstColumn,-30} {secondColumn}");
     }
 
@@ -125,7 +232,7 @@ public class Party
         if (choice == 0)
         {
             Console.WriteLine("Selection canceled.");
-            return; // Exit function on cancel
+            return;
         }
 
         if (choice < 1 || choice > personsInDataBase.Count)
@@ -133,20 +240,18 @@ public class Party
             Console.WriteLine($"Invalid choice. Please select a number between 1 and {personsInDataBase.Count}, or 0 to cancel.");
             continue;
         }
-
-        // Calculate the corresponding user_id
-        int userId = choice; // Since the list is ordered by user_id and 1-based indexing is used
+        
+        int userId = choice;
         Person selectedPerson = personsInDataBase[choice - 1];
 
         Console.WriteLine($"You selected: {selectedPerson.name}");
         if (PersonExists(selectedPerson, _persons))
         {
             Console.WriteLine($"A person with the same details already exists in the party.");
-            return; // Exit without adding the person
+            return;
         }
-        _persons.Add(selectedPerson); // Add the selected person to the party list
-
-        // Link the selected person to the current party in the PersonXParty table
+        _persons.Add(selectedPerson);
+        
         try
         {
             await _databaseActions.AddPersonXParty(userId, partyID);
@@ -157,7 +262,7 @@ public class Party
             Console.WriteLine($"Error linking person to party: {ex.Message}");
         }
 
-        break; // Exit the loop after a valid choice
+        break;
     }
 }
 
@@ -169,12 +274,12 @@ public class Party
         string input = Console.ReadLine();
         if (int.TryParse(input, out int selectedIndex) && selectedIndex >= 0 && selectedIndex <= _persons.Count)
         {
-            return selectedIndex - 1; // Convert to 0-based index
+            return selectedIndex - 1;
         }
         else
         {
             Console.WriteLine("Invalid input. Please try again.");
-            return -1; // Return -1 to indicate an invalid selection
+            return -1;
         }
     }
     
@@ -182,7 +287,7 @@ public class Party
     {
         int selectedIndex = SelectPersonMenu();
 
-        if (selectedIndex == -1) return; // Invalid input, return to menu
+        if (selectedIndex == -1) return;
         if (selectedIndex == -2)
         {
             Console.WriteLine("No person was deleted. Returning to the menu.");
@@ -194,9 +299,10 @@ public class Party
 
         if (confirmation?.ToLower() == "yes")
         {
-            int personID = await _databaseActions.GetPersonId(_persons[selectedIndex].name);
+            int personID = await _databaseActions.GetPersonId(_persons[selectedIndex]);
             await _databaseActions.RemovePersonFromParty(personID, partyID);
             _persons.RemoveAt(selectedIndex);
+            _organizer = null;
             Console.WriteLine("Person successfully deleted.");
         }
         else
@@ -204,50 +310,65 @@ public class Party
             Console.WriteLine("Deletion canceled.");
         }
     }
-
-    public async Task PartyMenu()
+    
+    private async Task SetOrganizer()
     {
-        bool running = true;
-        while (running)
+        Console.Clear();
+        Console.WriteLine("Set Organizer:");
+        Console.WriteLine("1) Add a new person");
+        Console.WriteLine("2) Select from registered persons");
+        Console.WriteLine("Enter your choice: ");
+
+        string input = Console.ReadLine();
+
+        if (input == "1")
+        {
+            await AddPerson();
+            if (_organizer == null && _persons.Count > 0)
+            {
+                _organizer = _persons.Last();
+                await _databaseActions.UpdatePartyOrganizer(partyID, await _databaseActions.GetPersonId(_organizer));
+            }
+        }
+        else if (input == "2")
         {
             Console.Clear();
-            Console.WriteLine(
-                              $"Menu> OrderMenu> PartyMenu" +
-                              $"\n---------------------------" +
-                              $"\n1) Add new person to party \n2) Add Already Registered Person to party \n3) Delete person from party\n4) Done \n0) Quit");
-            Console.WriteLine("\nEnter your choice: ");
-            string input = Console.ReadLine();
+            await DisplayAndSelectPersonFromDatabase(partyID);
 
-            if (!int.TryParse(input, out int choice))
+            if (_persons.Count > 0 && _organizer == null)
             {
-                Console.WriteLine("Invalid input. Please enter a number between 0 and 4.");
-                continue;
+                _organizer = _persons.Last();
+                await _databaseActions.UpdatePartyOrganizer(partyID, await _databaseActions.GetPersonId(_organizer));
             }
+        }
+        else
+        {
+            Console.WriteLine("Invalid choice. Returning to the party menu...");
+            Console.WriteLine("Press Enter to continue...");
+            Console.ReadLine();
+        }
+    }
+    private async Task AddPartyMembers()
+    {
+        Console.WriteLine("Would you like to add:");
+        Console.WriteLine("1) A new person");
+        Console.WriteLine("2) A registered person from the database");
+        Console.Write("Enter your choice: ");
+        string subInput = Console.ReadLine();
 
-            switch (choice)
-            {
-                case 1:
-                    await AddPerson();
-                    break;
-                case 2:
-                   await DisplayAndSelectPersonFromDatabase(partyID);
-                    break;
-                case 3:
-                    DeletePerson();
-                    break;
-                case 4:
-                    Console.WriteLine("Finished adding a party!");
-                    running = false; // Exit the menu loop
-                    break;
-                case 0:
-                    Console.WriteLine("Goodbye!");
-                    await _databaseActions.RemoveAllPersonsFromParty(partyID);
-                    running = false; // Exit the menu loop
-                    break;
-                default:
-                    Console.WriteLine("Invalid option. Please choose a valid menu option.");
-                    break;
-            }
+        if (subInput == "1")
+        {
+            await AddPerson();
+        }
+        else if (subInput == "2")
+        {
+            await DisplayAndSelectPersonFromDatabase(partyID);
+        }
+        else
+        {
+            Console.WriteLine("Invalid choice. Returning to the party menu...");
+            Console.WriteLine("Press Enter to continue...");
+            Console.ReadLine();
         }
     }
 
@@ -306,5 +427,36 @@ public class Party
                 Console.WriteLine("Invalid date format. Please try again (e.g., 2000-12-31):");
             }
         }
+    }
+    private void ViewPartyDetails()
+    {
+        Console.Clear();
+        Console.WriteLine("Party Details:");
+        Console.WriteLine("---------------------------");
+
+        if (_organizer != null)
+        {
+            Console.WriteLine($"Organizer: {_organizer.name}");
+        }
+        else
+        {
+            Console.WriteLine("Organizer: Not set");
+        }
+
+        if (_persons.Count > 0)
+        {
+            Console.WriteLine("Party Members:");
+            foreach (var person in _persons)
+            {
+                Console.WriteLine($"- {person.name} ({person.email})");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Party Members: None added yet.");
+        }
+
+        Console.WriteLine("\nPress Enter to return...");
+        Console.ReadLine();
     }
 }

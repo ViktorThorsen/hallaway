@@ -353,16 +353,44 @@ public class DatabaseActions
         }
     }
     
-    public async Task<int> GetPersonId(string name)
+    public async Task<int> GetPersonId(Person person)
     {
-        int person_id;
-        await using(var cmd = _db.CreateCommand($"SELECT user_id FROM public.person WHERE name = {name}"))
-        await using(var reader = await cmd.ExecuteReaderAsync())
+        const string query = @"
+        SELECT user_id 
+        FROM public.person 
+        WHERE name = @name AND phone = @phone AND email = @email AND date_of_birth = @dateOfBirth
+        LIMIT 1";
+
+        await using (var cmd = _db.CreateCommand(query))
         {
-            person_id = reader.GetInt32(0);
+            // Add parameters to prevent SQL injection and ensure proper formatting
+            cmd.Parameters.AddWithValue("@name", person.name);
+            cmd.Parameters.AddWithValue("@phone", person.phone);
+            cmd.Parameters.AddWithValue("@email", person.email);
+            cmd.Parameters.AddWithValue("@dateOfBirth", person.dateOfBirth);
+
+            try
+            {
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        // Return the user_id if a match is found
+                        return reader.GetInt32(0);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No matching person found in the database.");
+                        return -1; // Return -1 if no match is found
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching Person ID: {ex.Message}");
+                throw;
+            }
         }
-               
-        return person_id;
     }
 
     
