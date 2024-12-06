@@ -12,7 +12,7 @@ public class Order
     private DatePicker _datePicker;
     private DateTime start_date;
     private DateTime end_date;
-    private double totalPrice = 100;
+    private double totalPrice = 0;
     
     private DatabaseActions _databaseActions;
 
@@ -88,7 +88,12 @@ public class Order
                         if (!addonList.Contains(addon))
                         {
                             addonList.Add(addon);
+                            
                         }
+                    }
+                    foreach (var addon in addonList)
+                    {
+                        AddCostToTotal(addon.price);
                     }
                 }
                 break;
@@ -126,6 +131,7 @@ public class Order
             Console.WriteLine($"Start Date: {start_date}");
             Console.WriteLine($"Start Date: {end_date}");
             Console.WriteLine($"Destination: {hotel.hotelName}");
+            Console.WriteLine($"Total price: {totalPrice}");
             Console.WriteLine("\n0) Back");
 
             Console.WriteLine("\nEnter 0 to back: ");
@@ -142,5 +148,10 @@ public class Order
                 Console.ReadKey();
             }
         }
+    }
+
+    public void AddCostToTotal(double price)
+    {
+        totalPrice += price;
     }
 }

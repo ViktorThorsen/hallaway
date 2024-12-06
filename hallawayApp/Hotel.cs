@@ -17,7 +17,7 @@ public class Hotel
     
     public static List<Hotel> G;
 
-    //Constructor Hotel
+    //Constructor 
     public Hotel(int hotelId, string hotelName, Address address, bool pool,Rating ratingEnum, bool restaurante, bool kidsClub,
         int distanceBeach, int distanceCityCenter, bool eveningEntertainment, List<Room> roomList)
     {
