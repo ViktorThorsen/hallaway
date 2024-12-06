@@ -553,6 +553,7 @@ public class DatabaseActions
             await using (var cmd = _db.CreateCommand(
                              "SELECT * FROM addon JOIN addon_x_hotel ON addon.addon_id = addon_x_hotel.addon_id WHERE hotel_id = $1"))
             {
+                cmd.Parameters.AddWithValue(hotelId);
                 // Execute the command and get a data reader
                 await using (var reader = await cmd.ExecuteReaderAsync())
                 {

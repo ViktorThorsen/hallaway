@@ -63,19 +63,20 @@ public class AddonManager
         }
         foreach (var addon in addonList)
         {
-            Console.WriteLine($"Addon: {addon.name}\nDescription: {addon.description} Price: {addon.price}");
+            Console.WriteLine($"{addon.addonID}) Addon: {addon.name}\nDescription: {addon.description} Price: {addon.price}");
         }
-        Console.WriteLine("\nEnter addon or leave empty to return: "); 
+        Console.WriteLine("\nEnter addonID or leave empty to return: "); 
         string input = Console.ReadLine();
-        if (string.IsNullOrEmpty(input))
+        if (!int.TryParse(input, out int id))
         {
             Console.WriteLine("Invalid input. Please enter a valid number."); 
             return null;
         }
         
         List<Addon> selectedAddons = new List<Addon>();
-        var selectedAddon = addonList.FirstOrDefault(addon => addon.name.Equals(input, StringComparison.OrdinalIgnoreCase));        selectedAddons.Add(selectedAddon);
-
+        var selectedAddon = addonList.FirstOrDefault(addon => addon.addonID == id); 
+        selectedAddons.Add(selectedAddon);
+        
         if (selectedAddon == null)
         {
             Console.WriteLine($"No addons corresponded with given input: {input}.");
