@@ -12,7 +12,6 @@ public class DatabaseActions
         _db = db;
     }
     
-    // Method that takes int value as id and returns the address as an object
     public async Task<Address> GetAddress(int locationId)
     {
         await using (var cmd = _db.CreateCommand("SELECT * FROM address WHERE location_id = $1"))
@@ -21,29 +20,23 @@ public class DatabaseActions
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
-                if (await reader.ReadAsync()) // Check if a row is available
+                if (await reader.ReadAsync())
                 {
-                    
-                    // Assuming Address takes two string parameters
                     Console.WriteLine($"{reader.GetString(1)}");
                     return new Address(reader.GetString(1), reader.GetString(2));
                 }
             }
         }
-        // Return null if no row matches the ID
         Console.WriteLine("RETURN NULL");
         return null;
     }
     
-    // Method that takes int value as id and returns a list with rooms
     public async Task<List<Room>> GetRooms(int roomId)
     {
         List<Room> rooms = new List<Room>();
-
-        // Correctly reference the "room_id" column
+        
         await using (var cmd = _db.CreateCommand("SELECT * FROM public.room WHERE room_id = $1"))
         {
-            // Add parameter for room_id
             cmd.Parameters.AddWithValue(roomId);
 
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -51,8 +44,8 @@ public class DatabaseActions
                 while (await reader.ReadAsync())
                 {
                     Room room = new Room(
-                        reader.GetDouble(1),   // Room number
-                        reader.GetInt32(2),  // Price
+                        reader.GetDouble(1),
+                        reader.GetInt32(2),
                         true
                     );
 
@@ -64,77 +57,13 @@ public class DatabaseActions
         return rooms;
     }
     
-    // Method that takes int value as id and returns a list with addons
-    /*public async Task<List<Addon>> GetAddons(int addonId)
-    {
-        List<Addon> addons = new List<Addon>();
-        await using (var cmd = _db.CreateCommand($"SELECT * FROM public.addon WHERE addon_id = $1"))
-        {
-            cmd.Parameters.AddWithValue(addonId);
-            
-            await using (var reader = await cmd.ExecuteReaderAsync())
-            {
-                while (await reader.ReadAsync())
-                {
-                    Addon addon = new Addon(reader.GetString(1), reader.GetString(2), reader.GetDouble(3));
-                    addons.Add(addon);
-                }  
-        }
- 
-        }
-        return addons;
-    }*/
-    
-    // Method that reads all the hotels from the database and returns them as objects
-    /*public async Task<Hotel> GetHotel(string hotelName)
-    {
-        // Use a parameterized query to avoid SQL injection
-        await using (var cmd = _db.CreateCommand("SELECT * FROM public.hotel WHERE hotel_name = $1"))
-
-        {
-            cmd.Parameters.AddWithValue(hotelName); // Pass the hotel name safely
-
-            await using (var reader = await cmd.ExecuteReaderAsync())
-            {
-                if (await reader.ReadAsync())
-                {
-                    // Extract column values
-                    int addressId = reader.GetInt32(2); // Address ID
-                    Address address = await GetAddress(addressId);
-
-                    var rooms = await GetRooms(reader.GetInt32(0)); // Use hotel_id for room lookup
-
-                    // Construct the Hotel object
-                    Hotel hotel = new Hotel(
-                        reader.GetInt32(0), //hotel_id
-                        reader.GetString(1),  // hotel_name
-                        address,              // Address object
-                        reader.GetBoolean(3), // pool
-                        reader.GetBoolean(4), // restaurant
-                        reader.GetBoolean(5), // kidsClub
-                        reader.GetInt32(7),   // number_of_rooms
-                        reader.GetInt32(8),   // stars
-                        reader.GetBoolean(9), // is_active
-                        rooms                 // List<Room>
-                    );
-
-                    return hotel;
-                }
-            }
-        }
-
-        return null; // Return null if the hotel is not found
-    }*/
-
     public async Task<int> AddEmptyParty()
     {
         try
         {
-            // Insert a new empty party and return the auto-generated id
             await using (var cmd = _db.CreateCommand(
                              "INSERT INTO public.party (organizer_id) VALUES (NULL) RETURNING id"))
             {
-                // Execute the command and get the generated id
                 var partyId = (int)await cmd.ExecuteScalarAsync();
                 Console.WriteLine($"Empty party created successfully. Party ID: {partyId}");
                 return partyId;
@@ -142,7 +71,6 @@ public class DatabaseActions
         }
         catch (Exception ex)
         {
-            // Log the error
             Console.WriteLine($"Error creating empty party: {ex.Message}");
             throw;
         }
@@ -152,18 +80,13 @@ public class DatabaseActions
     {
         try
         {
-            // Update the organizer for the given party ID
             await using (var cmd = _db.CreateCommand(
                              "UPDATE public.party SET organizer_id = $1 WHERE id = $2"))
             {
-                // Add parameters for party ID and organizer ID
                 cmd.Parameters.AddWithValue(organizerId);
                 cmd.Parameters.AddWithValue(partyId);
-
-                // Execute the query
+                
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                // Confirm success
                 if (rowsAffected > 0)
                 {
                     Console.WriteLine($"Party {partyId} updated with organizer ID {organizerId}.");
@@ -176,7 +99,6 @@ public class DatabaseActions
         }
         catch (Exception ex)
         {
-            // Log any errors
             Console.WriteLine($"Error updating party organizer: {ex.Message}");
             throw;
         }
@@ -189,11 +111,8 @@ public class DatabaseActions
                              "INSERT INTO public.person_x_party (person_id, party_id) " +
                              "VALUES ($1, $2)"))
             {
-                // Add parameters
                 cmd.Parameters.AddWithValue(personId);
                 cmd.Parameters.AddWithValue(partyId);
-
-                // Execute the query
                 await cmd.ExecuteNonQueryAsync();
 
                 Console.WriteLine($"Person ID {personId} successfully linked to Party ID {partyId}.");
@@ -210,42 +129,32 @@ public class DatabaseActions
 {
     try
     {
-        // Debug log to check the person's data
         Console.WriteLine($"Inserting Person: Name={person.name}, Phone={person.phone}, Email={person.email}, DateOfBirth={person.dateOfBirth}, PartyID={partyId}");
 
         int personId;
-
-        // Step 1: Insert the person into the "Person" table
+        
         await using (var cmd = _db.CreateCommand(
                              "INSERT INTO public.person (name, phone, email, date_of_birth) " +
                              "VALUES ($1, $2, $3, $4) RETURNING user_id"))
         {
-            // Add parameters
             cmd.Parameters.AddWithValue(person.name);
             cmd.Parameters.AddWithValue(person.phone);
             cmd.Parameters.AddWithValue(person.email);
             cmd.Parameters.AddWithValue(person.dateOfBirth);
-
-            // Execute the query and get the generated ID
             personId = (int)await cmd.ExecuteScalarAsync();
-
-            // Debug log to confirm insertion
+            
             Console.WriteLine($"{person.name} added to database successfully with ID: {personId}.");
         }
-
-        // Step 2: Link the person to the party in the "PersonXParty" table
+        
         await using (var cmd = _db.CreateCommand(
                              "INSERT INTO public.person_x_party (person_id, party_id) " +
                              "VALUES ($1, $2)"))
         {
-            // Add parameters
             cmd.Parameters.AddWithValue(personId);
             cmd.Parameters.AddWithValue(partyId);
-
-            // Execute the query
+            
             await cmd.ExecuteNonQueryAsync();
-
-            // Debug log to confirm the relationship
+            
             Console.WriteLine($"Person ID {personId} linked to Party ID {partyId} successfully.");
         }
 
@@ -253,7 +162,6 @@ public class DatabaseActions
     }
     catch (Exception ex)
     {
-        // Log any exceptions
         Console.WriteLine($"Error adding person {person.name}: {ex.Message}");
         throw;
     }
@@ -262,15 +170,12 @@ public class DatabaseActions
     {
         try
         {
-            // Delete the entry from person_X_party where the user_id and party_id match
             await using (var cmd = _db.CreateCommand(
                              "DELETE FROM public.person_x_party WHERE person_id = $1 AND party_id = $2"))
             {
-                // Add parameters for the user_id and party_id
                 cmd.Parameters.AddWithValue(userId);
                 cmd.Parameters.AddWithValue(partyId);
-
-                // Execute the query
+                
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
                 if (rowsAffected > 0)
                 {
@@ -293,7 +198,6 @@ public class DatabaseActions
     {
         try
         {
-            // Delete all entries from person_X_party where the party_id matches
             await using (var cmd = _db.CreateCommand(
                              "DELETE FROM public.person_x_party WHERE party_id = $1"))
             {
@@ -329,15 +233,13 @@ public class DatabaseActions
                 {
                     while (await reader.ReadAsync())
                     {
-                        // Create a Person object from the row data
                         var person = new Person(
                             name: reader.GetString(reader.GetOrdinal("name")),
                             phone: reader.GetString(reader.GetOrdinal("phone")),
                             email: reader.GetString(reader.GetOrdinal("email")),
                             dateOfBirth: reader.GetDateTime(reader.GetOrdinal("date_of_birth"))
                         );
-
-                        // Add the person to the list
+                        
                         persons.Add(person);
                     }
                 }
@@ -363,7 +265,6 @@ public class DatabaseActions
 
         await using (var cmd = _db.CreateCommand(query))
         {
-            // Add parameters to prevent SQL injection and ensure proper formatting
             cmd.Parameters.AddWithValue("@name", person.name);
             cmd.Parameters.AddWithValue("@phone", person.phone);
             cmd.Parameters.AddWithValue("@email", person.email);
@@ -375,13 +276,12 @@ public class DatabaseActions
                 {
                     if (await reader.ReadAsync())
                     {
-                        // Return the user_id if a match is found
                         return reader.GetInt32(0);
                     }
                     else
                     {
                         Console.WriteLine("No matching person found in the database.");
-                        return -1; // Return -1 if no match is found
+                        return -1;
                     }
                 }
             }
@@ -397,7 +297,7 @@ public class DatabaseActions
 
     public async Task<int> AddOrder(int partyId, int adminId, int hotelId, DateTime startDate, double totalPrice, DateTime endDate)
     {
-        int orderId = -1; // Default value for error checking
+        int orderId = -1;
         const string query = @"
         INSERT INTO public.order (party, admin, hotel, totalprice, start_date, end_date)
         VALUES ($1, $2, $3, $4, $5, $6)
@@ -405,7 +305,6 @@ public class DatabaseActions
 
         await using (var cmd = _db.CreateCommand(query))
         {
-            // Add parameters with correct placeholders
             cmd.Parameters.AddWithValue(partyId);
             cmd.Parameters.AddWithValue(adminId);
             cmd.Parameters.AddWithValue(hotelId);
@@ -415,7 +314,6 @@ public class DatabaseActions
 
             try
             {
-                // Execute the command and fetch the returned order_id
                 orderId = (int)await cmd.ExecuteScalarAsync();
                 Console.WriteLine($"Order added successfully. Order ID: {orderId}");
             }
@@ -427,8 +325,6 @@ public class DatabaseActions
 
         return orderId;
     }
-    
-    //add new Hotel to DB
     public async void AddHotel(string name, Address address, bool pool, bool resturant, bool kidsClub, Rating rating, int distanceBeach, int distanceCityCenter, bool evningEntertainment)
     {
         int address_id = await GetAddressId(address.City, address.Street);
@@ -454,17 +350,14 @@ public class DatabaseActions
 
     try
     {
-        // Prepare the SQL command to fetch hotel data
         await using (var cmd = _db.CreateCommand(
             "SELECT hotel_id, hotel_name, address, pool,resturant,kidsclub, rating, distancebeach, " +
             "distancecitycenter, eveningentertainment FROM hotel ORDER BY hotel_id"))
         {
-            // Execute the command and get a data reader
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
                 while (await reader.ReadAsync())
                 {
-                    // Extract data from each column
                     int hotelId = reader.GetInt32(reader.GetOrdinal("hotel_id"));
                     string hotelName = reader.GetString(reader.GetOrdinal("hotel_name"));
                     int addressId = reader.GetInt32(reader.GetOrdinal("address"));
@@ -476,12 +369,10 @@ public class DatabaseActions
                     int distancebeach = reader.GetInt32(reader.GetOrdinal("distancebeach"));
                     int distanceCityCenter = reader.GetInt32(reader.GetOrdinal("distancecitycenter"));
                     bool eveningEntertainment = reader.GetBoolean(reader.GetOrdinal("eveningentertainment"));
-
-                    // Fetch related data
-                    Address address = await GetAddress(addressId); // Retrieve address based on ID
-                    var rooms = await GetRooms(hotelId);          // Retrieve rooms for this hotel
-
-                    // Create a new Hotel object
+                    
+                    Address address = await GetAddress(addressId);
+                    var rooms = await GetRooms(hotelId);
+                    
                     var hotel = new Hotel(
                         hotelId: hotelId,
                         hotelName: hotelName,
@@ -495,8 +386,6 @@ public class DatabaseActions
                         eveningEntertainment: eveningEntertainment,
                         roomList: rooms
                     );
-
-                    // Add the hotel to the list
                     hotels.Add(hotel);
                 }
             }
@@ -505,13 +394,10 @@ public class DatabaseActions
     catch (Exception ex)
     {
         Console.WriteLine($"An error occurred while fetching hotels: {ex.Message}");
-        // Handle or log the exception as necessary
     }
 
     return hotels;
 }
-    
-    //add new Room to DB
     public async void AddRoom(double price, int size, bool avalible)
     {
         await using (var cmd = _db.CreateCommand(" INSERT INTO public.room (price, size, isAvalible) VALUES ($1, $2, $3)"))
@@ -522,8 +408,6 @@ public class DatabaseActions
             await cmd.ExecuteReaderAsync();
         }
     }
-
-    // Add new AddOn to DB, missing order_id
     public async void AddAddon(string name, string description, double price, int hotel_id)
     {
         await using (var cmd = _db.CreateCommand(
@@ -585,7 +469,6 @@ public class DatabaseActions
 
         try
         {
-            // Prepare the SQL command to fetch addons for the given hotel
             const string query = @"
             SELECT addon.addon_id, addon.name, addon.description, addon.price
             FROM addon
@@ -594,23 +477,18 @@ public class DatabaseActions
 
             await using (var cmd = _db.CreateCommand(query))
             {
-                // Bind the parameter to the SQL query
                 cmd.Parameters.AddWithValue("@hotelId", hotelId);
-
-                // Execute the command and get a data reader
                 await using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
-                        // Extract data from each column
                         int addonID = reader.GetInt32(reader.GetOrdinal("addon_id"));
                         string name = reader.GetString(reader.GetOrdinal("name"));
                         string description = reader.GetString(reader.GetOrdinal("description"));
                         double price = reader.GetDouble(reader.GetOrdinal("price"));
-
-                        // Create a new Addon object
+                        
                         var addon = new Addon(
-                            addon_id: addonID, // Assuming Addon has an id field
+                            addon_id: addonID,
                             name: name,
                             description: description,
                             price: price
@@ -624,7 +502,6 @@ public class DatabaseActions
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred while fetching addons: {ex.Message}");
-            // Handle or log the exception as necessary
         }
 
         return addons;
@@ -642,11 +519,9 @@ public class DatabaseActions
                                  "INSERT INTO public.addon_x_order (addon_id, order_id) " +
                                  "VALUES ($1, $2)"))
                 {
-                    // Add parameters
                     cmd.Parameters.AddWithValue(addon_id);
                     cmd.Parameters.AddWithValue(order_id);
-
-                    // Execute the query
+                    
                     await cmd.ExecuteNonQueryAsync();
 
                     ;
