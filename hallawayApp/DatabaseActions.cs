@@ -367,11 +367,15 @@ public class DatabaseActions
 
     
 
-    public async Task AddOrder(int partyId, int adminId, int hotelId, DateTime startDate, double totalPrice, DateTime endDate)
+    public async Task<int> AddOrder(int partyId, int adminId, int hotelId, DateTime startDate, double totalPrice, DateTime endDate)
     {
-        await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO public.order (party, admin, hotel, totalprice, start_date, end_date)" +
-                         "VALUES ($1, $2, $3, $4, $5, $6)"))
+        int orderId = -1; // Default value for error checking
+        const string query = @"
+        INSERT INTO public.order (party, admin, hotel, totalprice, start_date, end_date)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING order_id";
+
+        await using (var cmd = _db.CreateCommand(query))
         {
             // Add parameters with correct placeholders
             cmd.Parameters.AddWithValue(partyId);
@@ -380,17 +384,20 @@ public class DatabaseActions
             cmd.Parameters.AddWithValue(totalPrice);
             cmd.Parameters.AddWithValue(startDate);
             cmd.Parameters.AddWithValue(endDate);
+
             try
             {
-               
-                await cmd.ExecuteNonQueryAsync();
-                Console.WriteLine("Order added successfully.");
+                // Execute the command and fetch the returned order_id
+                orderId = (int)await cmd.ExecuteScalarAsync();
+                Console.WriteLine($"Order added successfully. Order ID: {orderId}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding order: {ex.Message}");
             }
         }
+
+        return orderId;
     }
     
     //add new Hotel to DB
@@ -547,12 +554,21 @@ public class DatabaseActions
     public async Task<List<Addon>> GetAddons(int hotelId)
     {
         var addons = new List<Addon>();
+
         try
         {
-            // Prepare the SQL command to fetch hotel data
-            await using (var cmd = _db.CreateCommand(
-                             "SELECT * FROM addon JOIN addon_x_hotel ON addon.addon_id = addon_x_hotel.addon_id WHERE hotel_id = $1"))
+            // Prepare the SQL command to fetch addons for the given hotel
+            const string query = @"
+            SELECT addon.addon_id, addon.name, addon.description, addon.price
+            FROM addon
+            JOIN addon_x_hotel ON addon.addon_id = addon_x_hotel.addon_id
+            WHERE addon_x_hotel.hotel_id = @hotelId";
+
+            await using (var cmd = _db.CreateCommand(query))
             {
+                // Bind the parameter to the SQL query
+                cmd.Parameters.AddWithValue("@hotelId", hotelId);
+
                 // Execute the command and get a data reader
                 await using (var reader = await cmd.ExecuteReaderAsync())
                 {
@@ -561,15 +577,17 @@ public class DatabaseActions
                         // Extract data from each column
                         int addonID = reader.GetInt32(reader.GetOrdinal("addon_id"));
                         string name = reader.GetString(reader.GetOrdinal("name"));
-                        string description = reader.GetString(reader.GetOrdinal("description"));                    
+                        string description = reader.GetString(reader.GetOrdinal("description"));
                         double price = reader.GetDouble(reader.GetOrdinal("price"));
-            
+
                         // Create a new Addon object
                         var addon = new Addon(
+                            addon_id: addonID, // Assuming Addon has an id field
                             name: name,
                             description: description,
                             price: price
                         );
+
                         addons.Add(addon);
                     }
                 }
@@ -583,4 +601,34 @@ public class DatabaseActions
 
         return addons;
     }
+
+    public async Task AddtoAddonXOrder(List<Addon> addonList, int order_id)
+    {
+        foreach (Addon addon in addonList)
+        {
+            int addon_id = addon.addonID;
+            
+            try
+            {
+                await using (var cmd = _db.CreateCommand(
+                                 "INSERT INTO public.addon_x_order (addon_id, order_id) " +
+                                 "VALUES ($1, $2)"))
+                {
+                    // Add parameters
+                    cmd.Parameters.AddWithValue(addon_id);
+                    cmd.Parameters.AddWithValue(order_id);
+
+                    // Execute the query
+                    await cmd.ExecuteNonQueryAsync();
+
+                    ;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error linking addon ID {addon_id} to order ID {order_id}: {ex.Message}");
+                throw;
+            }
+        }   
+        }
 }

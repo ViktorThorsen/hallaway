@@ -7,11 +7,13 @@ public class Order
     private HotelManager _hotelManager;
     private int admin_id;
     private Hotel hotel;
+    private AddonManager _addonManager;
+    private List<Addon> addonList;
     private DatePicker _datePicker;
     private DateTime start_date;
     private DateTime end_date;
     private double totalPrice = 100;
-    private List<Addon> addonList;
+    
     private DatabaseActions _databaseActions;
 
     public Order(DatabaseActions databaseActions)
@@ -24,6 +26,8 @@ public class Order
         party = new Party(_databaseActions);
         _hotelManager = new HotelManager(_databaseActions);
         _datePicker = new DatePicker();
+        _addonManager = new AddonManager(_databaseActions);
+        addonList = new List<Addon>();
         bool running = true;
         admin_id = admin;
 
@@ -53,8 +57,9 @@ public class Order
                           $"\n1) Manage party {partymessage}" +
                           $"\n2) Set date {datemessage}" +
                           $"\n3) Select destination {hotelmessage}" +
-                          $"\n4) View details " +
-                          $"\n5) Done " +
+                          $"\n4) Add Extra Addons " +
+                          $"\n5) View details " +
+                          $"\n6) Done " +
                           $"\n0) Quit");
         Console.WriteLine("\nEnter your choice: ");
         int input = Int32.Parse(Console.ReadLine());
@@ -74,10 +79,26 @@ public class Order
                 hotel = await _hotelManager.FindHotelMenu();
                 break;
             case 4:
+                var newAddons = await _addonManager.FindAddonMenu(hotel.hotelID, addonList);
+                if (newAddons != null && newAddons.Any())
+                {
+                    // Add new addons to the existing list, avoiding duplicates
+                    foreach (var addon in newAddons)
+                    {
+                        if (!addonList.Contains(addon))
+                        {
+                            addonList.Add(addon);
+                        }
+                    }
+                }
+                break;
+                break;
+            case 5 :
                 await ShowOrderDetailsMenu();
                 break;
-            case 5:
-                await _databaseActions.AddOrder(party.partyID, admin_id, hotel.hotelID, start_date, totalPrice, end_date);
+            case 6:
+                int orderID = await _databaseActions.AddOrder(party.partyID, admin_id, hotel.hotelID, start_date, totalPrice, end_date);
+                await _databaseActions.AddtoAddonXOrder(addonList, orderID);
                 running = false;
                 break;
             case 0:
