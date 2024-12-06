@@ -367,23 +367,29 @@ public class DatabaseActions
 
     
 
-    public async Task AddOrder(int partyId, int adminId, int hotelId, DateTime orderDate, double totalPrice)
+    public async Task AddOrder(int partyId, int adminId, int hotelId, DateTime startDate, double totalPrice, DateTime endDate)
     {
-        // Define the SQL query for inserting a new order
         await using (var cmd = _db.CreateCommand(
-                         "INSERT INTO public.order (party, admin, hotel, date, totalprice) " +
-                         "VALUES ($1, $2, $3, $4, $5)"))
+                         "INSERT INTO public.order (party, admin, hotel, totalprice, start_date, end_date)" +
+                         "VALUES ($1, $2, $3, $4, $5, $6)"))
         {
-            // Add parameters to the query
-            cmd.Parameters.AddWithValue(partyId);       // Foreign key: Party ID
-            cmd.Parameters.AddWithValue(adminId);       // Foreign key: Admin ID
-            cmd.Parameters.AddWithValue(hotelId);       // Foreign key: Hotel ID
-            cmd.Parameters.AddWithValue(orderDate);   // Date of the order
-            cmd.Parameters.AddWithValue(totalPrice); // Total price of the order
-
-            // Execute the command
-            await cmd.ExecuteNonQueryAsync();
-            Console.WriteLine("Order added successfully.");
+            // Add parameters with correct placeholders
+            cmd.Parameters.AddWithValue(partyId);
+            cmd.Parameters.AddWithValue(adminId);
+            cmd.Parameters.AddWithValue(hotelId);
+            cmd.Parameters.AddWithValue(totalPrice);
+            cmd.Parameters.AddWithValue(startDate);
+            cmd.Parameters.AddWithValue(endDate);
+            try
+            {
+               
+                await cmd.ExecuteNonQueryAsync();
+                Console.WriteLine("Order added successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding order: {ex.Message}");
+            }
         }
     }
     
@@ -494,21 +500,6 @@ public class DatabaseActions
             cmd.Parameters.AddWithValue(hotel_id);
             await cmd.ExecuteReaderAsync();
         }
-    }
-
-    public async Task AddOrder(int partyId,int adminId, Hotel hotel, DateTime start_date, DateTime end_date, double totalPrice)
-    {
-        await using (var cmd = _db.CreateCommand(
-                         " INSERT INTO public.order (party, admin, hotel, start_date, end_date totalprice) VALUES ($1, $2, $3, $4, $5, $6)"))
-        {
-            cmd.Parameters.AddWithValue(partyId);
-            cmd.Parameters.AddWithValue(adminId);
-            cmd.Parameters.AddWithValue(hotel.hotelID);
-            cmd.Parameters.AddWithValue(start_date);
-            cmd.Parameters.AddWithValue(end_date);
-            cmd.Parameters.AddWithValue(totalPrice);
-        }
- 
     }
 
     public async Task<int> GetAddressId(string city, string street)

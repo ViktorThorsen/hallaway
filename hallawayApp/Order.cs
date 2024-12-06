@@ -5,12 +5,12 @@ public class Order
     private string orderName;
     private Party party;
     private HotelManager _hotelManager;
-    private Admin admin;
+    private int admin_id;
     private Hotel hotel;
     private DatePicker _datePicker;
     private DateTime start_date;
     private DateTime end_date;
-    private double totalPrice;
+    private double totalPrice = 100;
     private List<Addon> addonList;
     private DatabaseActions _databaseActions;
 
@@ -25,15 +25,34 @@ public class Order
         _hotelManager = new HotelManager(_databaseActions);
         _datePicker = new DatePicker();
         bool running = true;
+        admin_id = admin;
 
-        while (running){ 
+        while (running)
+        {
+            string partymessage = "(NOT done)";
+            string hotelmessage = "(NOT done)";
+            string datemessage = "(NOT done)";
+            if (party._persons.Count >= 1)
+            {
+                partymessage = "(Done)";
+            }
+
+            if (start_date != DateTime.MinValue && end_date != DateTime.MinValue)
+            {
+                datemessage = "(Done)";
+            }
+            if (hotel != null && hotel.hotelID != null)
+            {
+                hotelmessage = "(Done)";
+            }
+            
             Console.Clear();
         Console.WriteLine(
                           $"Menu> OrderMenu" +
                           $"\n---------------------------" + 
-                          $"\n1) Manage party " +
-                          $"\n2) Set date " +
-                          $"\n3) Select destination " +
+                          $"\n1) Manage party {partymessage}" +
+                          $"\n2) Set date {datemessage}" +
+                          $"\n3) Select destination {hotelmessage}" +
                           $"\n4) View details " +
                           $"\n5) Done " +
                           $"\n0) Quit");
@@ -52,13 +71,13 @@ public class Order
                 end_date = endDate;
                 break;
             case 3:
-                await _hotelManager.FindHotelMenu();
+                hotel = await _hotelManager.FindHotelMenu();
                 break;
             case 4:
-                ShowOrderDetailsMenu();
+                await ShowOrderDetailsMenu();
                 break;
             case 5:
-                _databaseActions.AddOrder(party.partyID, admin, hotel, start_date, end_date, totalPrice);
+                await _databaseActions.AddOrder(party.partyID, admin_id, hotel.hotelID, start_date, totalPrice, end_date);
                 running = false;
                 break;
             case 0:
@@ -85,7 +104,7 @@ public class Order
             }
             Console.WriteLine($"Start Date: {start_date}");
             Console.WriteLine($"Start Date: {end_date}");
-            Console.WriteLine($"Destination: ");
+            Console.WriteLine($"Destination: {hotel.hotelName}");
             Console.WriteLine("\n0) Back");
 
             Console.WriteLine("\nEnter 0 to back: ");
@@ -103,33 +122,4 @@ public class Order
             }
         }
     }
-    //  Method that produces a list of hotels
-    /*
-    public void ShowAllHotels()
-    {
-        // Get list of hotels from the database
-        List<Hotel> hotelList = new List<Hotel>();
-
-        // Checking if the list hotelList is empty
-        if (hotelList.Count == 0) 
-        {
-            // If no hotels are found
-            Console.WriteLine("No hotels available.");
-        }
-        else
-        {
-            // Showing available hotels
-            Console.WriteLine("Available hotels:");
-            foreach (var hotel in hotelList)
-            {
-                // Showing hotel details 
-                Console.WriteLine($"Name: {hotel.hotelName},Address: {hotel.address}," +
-                                  $"Pool: {hotel.pool}," +
-                                  $"KidsClub: {hotel.kidsClub}, Distance to beach: {hotel.distanceBeach}" +
-                                  $"Distance to city: {hotel.distanceCityCenter}," +
-                                  $"Evening entertainment: {hotel.eveningEntertainment}");
-            }
-        }
-        Console.WriteLine();
-    }*/
 }
