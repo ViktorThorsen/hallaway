@@ -24,15 +24,16 @@ public class Order
     }
 
     public async Task CreateOrder(int admin)
-{
-    party = new Party(_databaseActions);
-    _hotelManager = new HotelManager(_databaseActions);
-    _datePicker = new DatePicker();
-    _addonManager = new AddonManager(_databaseActions);
-    addonList = new List<Addon>();
-    admin_id = admin;
+    {
+        party = new Party(_databaseActions);
+        _hotelManager = new HotelManager(_databaseActions);
+        _datePicker = new DatePicker();
+        _addonManager = new AddonManager(_databaseActions);
+        addonList = new List<Addon>();
+        bool running = true;
+        admin_id = admin;
 
-    bool running = true;
+     running = true;
 
     while (running)
     {
@@ -56,48 +57,38 @@ public class Order
         Console.WriteLine($"0) Quit");
 
         Console.WriteLine("\nEnter your choice: ");
-        if (!int.TryParse(Console.ReadLine(), out int choice))
-        {
-            Console.WriteLine("Invalid input. Please enter a number between 0 and 6.");
-            Console.WriteLine("Press Enter to continue...");
-            Console.ReadLine();
-            continue;
-        }
+        int input = Int32.Parse(Console.ReadLine());
+        Debug.Assert(input != null);
 
-        switch (choice)
+        switch (input)
         {
-            case 1: // Step 1: Manage Party
+            case 1:
                 await party.PartyMenu();
                 break;
-
-            case 2: // Step 2: Select Destination (Only available if party is managed)
-                if (party._persons.Count < 1)
+            case 2:
+                var (startDate, endDate) = _datePicker.PickDateRange();
+                start_date = startDate;
+                end_date = endDate;
+                break;
+            case 3:
+                hotel = await _hotelManager.FindHotelMenu();
+                break;
+            case 4:
+                var newAddons = await _addonManager.FindAddonMenu(hotel.hotelID, addonList);
+                if (newAddons != null && newAddons.Any())
                 {
-                    Console.WriteLine("You must manage the party before selecting a destination.");
-                    Console.WriteLine("Press Enter to continue...");
-                    Console.ReadLine();
-                }
-                else
-                {
-                    hotel = await _hotelManager.FindHotelMenu();
+                    // Add new addons to the existing list, avoiding duplicates
+                    foreach (var addon in newAddons)
+                    {
+                        if (!addonList.Contains(addon))
+                        {
+                            addonList.Add(addon);
+                        }
+                    }
                 }
                 break;
-            case 4: // Step 4: Set Date (Only available if destination is selected)
-                if (hotel == null || hotel.hotelID == null)
-                {
-                    Console.WriteLine("You must select a destination before setting the date.");
-                    Console.WriteLine("Press Enter to continue...");
-                    Console.ReadLine();
-                }
-                else
-                {
-                    var (startDate, endDate) = _datePicker.PickDateRange();
-                    start_date = startDate;
-                    end_date = endDate;
-                }
                 break;
-
-            case 5: // View Details
+            case 5 :
                 await ShowOrderDetailsMenu();
                 break;
 
@@ -135,22 +126,35 @@ public class Order
 
     public async Task ShowOrderDetailsMenu()
     {
-        Console.Clear();
-        Console.WriteLine("Menu> OrderMenu");
-        Console.WriteLine("---------------------------");
-        Console.WriteLine("Persons in Party:");
-        foreach (Person person in party._persons)
-        {
-            Console.WriteLine($"{person.name}");
-        }
+        bool viewingDetails = true;
 
-        Console.WriteLine($"Start Date: {start_date}");
-        Console.WriteLine($"End Date: {end_date}");
-        Console.WriteLine($"Destination: {hotel?.hotelName ?? "No destination selected"}");
-        Console.WriteLine("Selected Addons:");
-        foreach (var addon in addonList)
+        while (viewingDetails)
         {
-            Console.WriteLine($"- {addon.name} (${addon.price})");
+            Console.Clear();
+            Console.WriteLine($"Menu> OrderMenu \n---------------------------");
+            Console.WriteLine($"Persons in Party: ");
+            foreach (Person person in party._persons)
+            {
+                Console.WriteLine($"{person.name}");
+            }
+            Console.WriteLine($"Start Date: {start_date}");
+            Console.WriteLine($"Start Date: {end_date}");
+            Console.WriteLine($"Destination: {hotel.hotelName}");
+            Console.WriteLine("\n0) Back");
+
+            Console.WriteLine("\nEnter 0 to back: ");
+            string input = Console.ReadLine();
+
+            if (input == "0")
+            {
+                viewingDetails = false; // Exit the details menu
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter '0' to go back.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
         }
     }
 
