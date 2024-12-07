@@ -9,11 +9,10 @@ public class Order
     private HotelManager _hotelManager;
     private int admin_id;
     private Hotel hotel;
+    private Reservation _reservation;
     private AddonManager _addonManager;
     private List<Addon> addonList;
-    private DatePicker _datePicker;
-    private DateTime start_date;
-    private DateTime end_date;
+    private RoomManager _roomManager;
     private double totalPrice = 100;
 
     private DatabaseActions _databaseActions;
@@ -27,9 +26,10 @@ public class Order
 {
     party = new Party(_databaseActions);
     _hotelManager = new HotelManager(_databaseActions);
-    _datePicker = new DatePicker();
+    _roomManager = new RoomManager(_databaseActions);
     _addonManager = new AddonManager(_databaseActions);
     addonList = new List<Addon>();
+    _reservation = new Reservation();
     admin_id = admin;
 
     bool running = true;
@@ -42,7 +42,7 @@ public class Order
         string partymessage = party._persons.Count >= 1 ? "(Done)" : "(NOT done)";
         string hotelmessage = (hotel != null && hotel.hotelID != null) ? "(Done)" : "(NOT done)";
         string addonsMessage = addonList.Any() ? "(Done)" : "(NOT done)";
-        string datemessage = (start_date != DateTime.MinValue && end_date != DateTime.MinValue) ? "(Done)" : "(NOT done)";
+        string datemessage = (_reservation.StartDate != DateTime.MinValue && _reservation.EndDate != DateTime.MinValue) ? "(Done)" : "(NOT done)";
 
         // Main menu
         Console.WriteLine("Menu> OrderMenu");
@@ -50,7 +50,7 @@ public class Order
         Console.WriteLine($"1) Manage party {partymessage}");
         Console.WriteLine($"2) Select destination {hotelmessage}");
         Console.WriteLine($"3) Add Extra Addons {addonsMessage}");
-        Console.WriteLine($"4) Set date {datemessage}");
+        Console.WriteLine($"4) Select Room And Date {datemessage}");
         Console.WriteLine($"5) View details");
         Console.WriteLine($"6) Done");
         Console.WriteLine($"0) Quit");
@@ -109,15 +109,13 @@ public class Order
             case 4: // Step 4: Set Date (Only available if destination is selected)
                 if (hotel == null || hotel.hotelID == null)
                 {
-                    Console.WriteLine("You must select a destination before setting the date.");
+                    Console.WriteLine("You must select a destination before selecting room and date.");
                     Console.WriteLine("Press Enter to continue...");
                     Console.ReadLine();
                 }
                 else
                 {
-                    var (startDate, endDate) = _datePicker.PickDateRange();
-                    start_date = startDate;
-                    end_date = endDate;
+                    _reservation = await _roomManager.RoomMenu(hotel);
                 }
                 break;
 
@@ -126,7 +124,7 @@ public class Order
                 break;
 
             case 6: // Final Step: Complete Order (Only available if all steps are done)
-                if (party._persons.Count < 1 || hotel == null || hotel.hotelID == null || start_date == DateTime.MinValue || end_date == DateTime.MinValue)
+                if (party._persons.Count < 1 || hotel == null || hotel.hotelID == null || _reservation.RoomId == null)
                 {
                     Console.WriteLine("You must complete all previous steps before finalizing the order.");
                     Console.WriteLine("Press Enter to continue...");
@@ -134,7 +132,8 @@ public class Order
                 }
                 else
                 {
-                    int orderID = await _databaseActions.AddOrder(party.partyID, admin_id, hotel.hotelID, start_date, totalPrice, end_date);
+                    int reservation_id = await _databaseActions.AddReservation(_reservation);
+                    int orderID = await _databaseActions.AddOrder(party.partyID, admin_id, hotel.hotelID, totalPrice, reservation_id);
                     await _databaseActions.AddtoAddonXOrder(addonList, orderID);
                     Console.WriteLine("Order completed successfully!");
                     Console.WriteLine("Press Enter to exit...");
@@ -167,8 +166,8 @@ public class Order
         {
             Console.WriteLine($"{person.name}");
         }
-        Console.WriteLine($"Start Date: {start_date}");
-        Console.WriteLine($"End Date: {end_date}");
+        Console.WriteLine($"Start Date: {_reservation.StartDate}");
+        Console.WriteLine($"End Date: {_reservation.EndDate}");
         Console.WriteLine($"Destination: {hotel?.hotelName ?? "No destination selected"}");
         Console.WriteLine("Selected Addons:");
         foreach (var addon in addonList)

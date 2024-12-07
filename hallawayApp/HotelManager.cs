@@ -10,6 +10,7 @@ public class HotelManager
     private int? distancetobeach;
     private int? rating;
     private bool? hasPool;
+    private string sortOption = "default";
 
     public HotelManager(DatabaseActions databaseActions)
     {
@@ -28,14 +29,15 @@ public class HotelManager
             Console.WriteLine(
                 $"Menu> OrderMenu> DestinationMenu" +
                 $"\n---------------------------" +
-                $"\n1) Show all hotels \n2) Filter on city \n3) Filter on distance to beach" +
-                $"\n4) Filter on rating \n5) Filter on pool availability \n6) Clear filters \n0) Return");
+                $"\n1) Show all hotels, Sorting Order:({sortOption}) \n2) Filter on city \n3) Filter on distance to beach" +
+                $"\n4) Filter on rating \n5) Filter on pool availability" +
+                $"\n6) Clear filters \n7) Change sort order \n0) Return");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
 
             if (!int.TryParse(input, out int choice))
             {
-                Console.WriteLine("Invalid input. Please enter a number between 0 and 6.");
+                Console.WriteLine("Invalid input. Please enter a number between 0 and 7.");
                 continue;
             }
 
@@ -63,6 +65,9 @@ public class HotelManager
                 case 6:
                     ClearFilters();
                     break;
+                case 7:
+                    ChangeSortOrder();
+                    break;
                 case 0:
                     running = false;
                     break;
@@ -74,40 +79,69 @@ public class HotelManager
         return null; // Return null if no hotel is selected
     }
 
-    private Hotel ShowHotels()
+   private Hotel ShowHotels()
+{
+    Console.Clear();
+
+    var filteredHotels = hotelList.Where(hotel =>
+        (string.IsNullOrEmpty(city) || hotel.address.City.Equals(city, StringComparison.OrdinalIgnoreCase)) &&
+        (!distancetobeach.HasValue || hotel.distanceBeach <= distancetobeach.Value) &&
+        (!rating.HasValue || (int)hotel.ratingEnum >= rating.Value) &&
+        (!hasPool.HasValue || hotel.pool == hasPool.Value)
+    ).ToList();
+
+    // Sort the filtered list based on the selected sort option
+    filteredHotels = sortOption switch
     {
-        Console.Clear();
+        "name" => filteredHotels.OrderBy(h => h.hotelName).ToList(),
+        "rating" => filteredHotels.OrderByDescending(h => h.ratingEnum).ToList(),
+        "distanceBeach" => filteredHotels.OrderBy(h => h.distanceBeach).ToList(),
+        "distanceCityCenter" => filteredHotels.OrderBy(h => h.distanceCityCenter).ToList(),
+        _ => filteredHotels // Default order
+    };
 
-        var filteredHotels = hotelList.Where(hotel =>
-            (string.IsNullOrEmpty(city) || hotel.address.City.Equals(city, StringComparison.OrdinalIgnoreCase)) &&
-            (!distancetobeach.HasValue || hotel.distanceBeach <= distancetobeach.Value) &&
-            (!rating.HasValue || (int)hotel.ratingEnum >= rating.Value) &&
-            (!hasPool.HasValue || hotel.pool == hasPool.Value)
-        ).ToList();
-
-        if (!filteredHotels.Any())
-        {
-            Console.WriteLine("No hotels match the current filters.");
-            return null;
-        }
-        else
-        {
-            foreach (var hotel in filteredHotels)
-            {
-                Console.WriteLine($"{hotel.hotelID}) {hotel.hotelName} - City: {hotel.address.City}, Distance to beach: {hotel.distanceBeach} meters, Rating: {hotel.ratingEnum}, Pool: {hotel.pool}");
-            }
-        } 
-        Console.WriteLine("\nEnter hotel id or leave empty to return: "); 
-        string input = Console.ReadLine();
-        if (!int.TryParse(input, out int id))
-        {
-            Console.WriteLine("Invalid input. Please enter a valid number."); return null;
-        } 
-        var selectedHotel = filteredHotels.FirstOrDefault(hotel => hotel.hotelID == id); 
-        if (selectedHotel == null) 
-        { Console.WriteLine("No hotel found with the given ID."); } 
-        return selectedHotel;
+    if (!filteredHotels.Any())
+    {
+        Console.WriteLine("No hotels match the current filters.");
+        return null;
     }
+
+    // Header
+    Console.WriteLine("Hotels:");
+    Console.WriteLine(new string('-', 100));
+    Console.WriteLine("{0,-5} | {1,-25} | {2,-15} | {3,-15} | {4,-12} | {5,-12} | {6,-5}",
+                      "ID", "Name", "City", "Rating", "Beach (m)", "Center (m)", "Pool");
+    Console.WriteLine(new string('-', 100));
+
+    // Body
+    foreach (var hotel in filteredHotels)
+    {
+        Console.WriteLine("{0,-5} | {1,-25} | {2,-15} | {3,-15} | {4,-12} | {5,-12} | {6,-5}",
+                          hotel.hotelID,
+                          hotel.hotelName,
+                          hotel.address.City,
+                          hotel.ratingEnum.ToString().Replace("_", " "), // Formatting the rating
+                          hotel.distanceBeach,
+                          hotel.distanceCityCenter,
+                          hotel.pool ? "Yes" : "No");
+    }
+
+    Console.WriteLine(new string('-', 100));
+    Console.WriteLine("\nEnter hotel id or leave empty to return: ");
+    string input = Console.ReadLine();
+    if (!int.TryParse(input, out int id))
+    {
+        Console.WriteLine("Invalid input. Please enter a valid number.");
+        return null;
+    }
+
+    var selectedHotel = filteredHotels.FirstOrDefault(hotel => hotel.hotelID == id);
+    if (selectedHotel == null)
+    {
+        Console.WriteLine("No hotel found with the given ID.");
+    }
+    return selectedHotel;
+}
 
     public string FilterOnCity()
     {
@@ -207,6 +241,44 @@ public class HotelManager
         Console.Clear();
         Console.WriteLine("All filters have been cleared.");
         Console.WriteLine("Press enter to continue.");
+        Console.ReadLine();
+    }
+    
+    private void ChangeSortOrder()
+    {
+        Console.Clear();
+        Console.WriteLine("Choose sorting option:");
+        Console.WriteLine("1) Default (No specific order)");
+        Console.WriteLine("2) Order by name");
+        Console.WriteLine("3) Order by rating");
+        Console.WriteLine("4) Order by distance to beach");
+        Console.WriteLine("5) Order by distance to city center");
+
+        string input = Console.ReadLine();
+        switch (input)
+        {
+            case "1":
+                sortOption = "default";
+                break;
+            case "2":
+                sortOption = "name";
+                break;
+            case "3":
+                sortOption = "rating";
+                break;
+            case "4":
+                sortOption = "distanceBeach";
+                break;
+            case "5":
+                sortOption = "distanceCityCenter";
+                break;
+            default:
+                Console.WriteLine("Invalid option. Keeping current sort order.");
+                break;
+        }
+
+        Console.WriteLine($"Sorting order set to: {sortOption}");
+        Console.WriteLine("Press Enter to continue...");
         Console.ReadLine();
     }
 }

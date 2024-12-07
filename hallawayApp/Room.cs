@@ -2,14 +2,15 @@
 
 public class Room
 {
-    public double _price;
-    public int _size;
-    public bool _isAvailable;
- 
-    public Room(double price, int size, bool isAvailable)
+    public int RoomId { get; set; } // Unique identifier for the room
+    public double Price { get; set; }
+    public int Size { get; set; }
+    
+
+    public Room(int roomId, double price, int size)
     {
-        this._price = price;
-        this._size = size;
-        this._isAvailable = isAvailable;
+        RoomId = roomId;
+        Price = price;
+        Size = size;
     }
 }

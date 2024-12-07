@@ -30,23 +30,128 @@ public class DatabaseActions
         Console.WriteLine("RETURN NULL");
         return null;
     }
+    public async Task<List<Room>> GetRoomsByHotelId(int hotelId)
+    {
+        var rooms = new List<Room>();
+        const string query = "SELECT room_id, price, size FROM public.room WHERE hotel_id = $1";
+
+        await using (var cmd = _db.CreateCommand(query))
+        {
+            cmd.Parameters.AddWithValue(hotelId);
+
+            try
+            {
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var room = new Room(
+                            roomId: reader.GetInt32(reader.GetOrdinal("room_id")),
+                            price: reader.GetDouble(reader.GetOrdinal("price")),
+                            size: reader.GetInt32(reader.GetOrdinal("size"))
+                        );
+
+                        rooms.Add(room);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching rooms for hotel ID {hotelId}: {ex.Message}");
+                throw;
+            }
+        }
+
+        return rooms;
+    }
     
-    public async Task<List<Room>> GetRooms(int roomId)
+    public async Task<List<Reservation>> GetReservationsForHotel(int hotelId)
+    {
+        var reservations = new List<Reservation>();
+        const string query = @"
+        SELECT room_id, start_date, end_date 
+        FROM public.reservation 
+        WHERE room_id IN (SELECT room_id FROM public.room WHERE hotel_id = $1)
+          AND ((start_date >= '2024-12-01' AND start_date <= '2025-01-31') 
+            OR (end_date >= '2024-12-01' AND end_date <= '2025-01-31'))";
+
+        await using (var cmd = _db.CreateCommand(query))
+        {
+            // Correctly bind the hotelId to the query
+            cmd.Parameters.AddWithValue(hotelId);
+
+            try
+            {
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var reservation = new Reservation
+                        {
+                            RoomId = reader.GetInt32(reader.GetOrdinal("room_id")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("start_date")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("end_date"))
+                        };
+
+                        reservations.Add(reservation);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching reservations for hotel ID {hotelId}: {ex.Message}");
+                throw;
+            }
+        }
+
+        return reservations;
+    }
+    
+    public async Task<int> AddReservation(Reservation reservation)
+    {
+        const string query = @"
+    INSERT INTO public.reservation (room_id, start_date, end_date) 
+    VALUES ($1, $2, $3) 
+    RETURNING id";
+
+        await using (var cmd = _db.CreateCommand(query))
+        {
+            // Bind the parameters from the Reservation object
+            cmd.Parameters.AddWithValue(reservation.RoomId);
+            cmd.Parameters.AddWithValue(reservation.StartDate);
+            cmd.Parameters.AddWithValue(reservation.EndDate);
+
+            try
+            {
+                // Execute the command and return the reservation_id
+                int reservationId = (int)await cmd.ExecuteScalarAsync();
+                Console.WriteLine($"Reservation added successfully with ID {reservationId} for Room ID {reservation.RoomId}.");
+                return reservationId;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding reservation: {ex.Message}");
+                throw;
+            }
+        }
+    }
+    
+    public async Task<List<Room>> GetRooms(int roomID)
     {
         List<Room> rooms = new List<Room>();
         
         await using (var cmd = _db.CreateCommand("SELECT * FROM public.room WHERE room_id = $1"))
         {
-            cmd.Parameters.AddWithValue(roomId);
+            cmd.Parameters.AddWithValue(roomID);
 
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
                 while (await reader.ReadAsync())
                 {
                     Room room = new Room(
+                        roomId: roomID,
                         reader.GetDouble(1),
-                        reader.GetInt32(2),
-                        true
+                        reader.GetInt32(2)
                     );
 
                     rooms.Add(room);
@@ -295,12 +400,12 @@ public class DatabaseActions
 
     
 
-    public async Task<int> AddOrder(int partyId, int adminId, int hotelId, DateTime startDate, double totalPrice, DateTime endDate)
+    public async Task<int> AddOrder(int partyId, int adminId, int hotelId, double totalPrice, int reservertion_id)
     {
         int orderId = -1;
         const string query = @"
-        INSERT INTO public.order (party, admin, hotel, totalprice, start_date, end_date)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO public.order (party, admin, hotel, totalprice, reservation_id)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING order_id";
 
         await using (var cmd = _db.CreateCommand(query))
@@ -309,9 +414,7 @@ public class DatabaseActions
             cmd.Parameters.AddWithValue(adminId);
             cmd.Parameters.AddWithValue(hotelId);
             cmd.Parameters.AddWithValue(totalPrice);
-            cmd.Parameters.AddWithValue(startDate);
-            cmd.Parameters.AddWithValue(endDate);
-
+            cmd.Parameters.AddWithValue(reservertion_id);
             try
             {
                 orderId = (int)await cmd.ExecuteScalarAsync();
