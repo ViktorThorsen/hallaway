@@ -78,7 +78,6 @@ public class DatabaseActions
 
         await using (var cmd = _db.CreateCommand(query))
         {
-            // Correctly bind the hotelId to the query
             cmd.Parameters.AddWithValue(hotelId);
 
             try
@@ -117,14 +116,12 @@ public class DatabaseActions
 
         await using (var cmd = _db.CreateCommand(query))
         {
-            // Bind the parameters from the Reservation object
             cmd.Parameters.AddWithValue(reservation.RoomId);
             cmd.Parameters.AddWithValue(reservation.StartDate);
             cmd.Parameters.AddWithValue(reservation.EndDate);
 
             try
             {
-                // Execute the command and return the reservation_id
                 int reservationId = (int)await cmd.ExecuteScalarAsync();
                 Console.WriteLine($"Reservation added successfully with ID {reservationId} for Room ID {reservation.RoomId}.");
                 return reservationId;
@@ -150,10 +147,10 @@ public class DatabaseActions
                 while (await reader.ReadAsync())
                 {
                     Room room = new Room(
-                        roomId: reader.GetInt32(0),              // room_id
-                        roomName: reader.GetString(4),          // room_name
-                        price: reader.GetDouble(1),             // price
-                        size: reader.GetInt32(2)               // size
+                        roomId: reader.GetInt32(0),
+                        roomName: reader.GetString(4),
+                        price: reader.GetDouble(1),
+                        size: reader.GetInt32(2)
                     );
 
                     rooms.Add(room);

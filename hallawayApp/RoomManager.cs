@@ -20,7 +20,7 @@ public class RoomManager
     Room? selectedRoom = null;
     DateTime? startDate = null;
     DateTime? endDate = null;
-    string sortOption = "price"; // Default sorting by price
+    string sortOption = "price";
     bool running = true;
 
     while (running)
@@ -48,11 +48,11 @@ public class RoomManager
 
         switch (choice)
         {
-            case 1: // Select Dates
+            case 1:
                 (startDate, endDate) = PickDateRange();
                 break;
 
-            case 2: // Change Sort Option
+            case 2:
                 Console.Clear();
                 Console.WriteLine("Choose sorting option:");
                 Console.WriteLine("1) Price");
@@ -77,11 +77,11 @@ public class RoomManager
                 Console.ReadLine();
                 break;
 
-            case 3: // Show All Rooms
+            case 3:
                 selectedRoom = await ShowAndSelectRoom(hotel, startDate, endDate, sortOption);
                 break;
 
-            case 4: // View Selected Room
+            case 4:
                 Console.WriteLine(selectedRoom != null
                     ? $"Selected Room Details:\n  Room ID: {selectedRoom.RoomId}, Price: {selectedRoom.Price.ToString("C", new CultureInfo("sv-SE"))}, Size: {selectedRoom.Size} sqm"
                     : "No room selected.");
@@ -89,7 +89,7 @@ public class RoomManager
                 Console.ReadLine();
                 break;
 
-            case 5: // Done
+            case 5:
                 if (selectedRoom != null && startDate.HasValue && endDate.HasValue)
                 {
                     running = false;
@@ -108,7 +108,7 @@ public class RoomManager
                 }
                 break;
 
-            case 0: // Return to Previous Menu
+            case 0:
                 running = false;
                 Console.WriteLine("Returning to the previous menu...");
                 return null;
@@ -120,7 +120,7 @@ public class RoomManager
         }
     }
 
-    return null; // Default return if the loop exits
+    return null;
 }
 
    private async Task<Room?> ShowAndSelectRoom(Hotel hotel, DateTime? startDate, DateTime? endDate, string sortOption)
@@ -139,8 +139,7 @@ public class RoomManager
 
     var rooms = await _databaseActions.GetRoomsByHotelId(hotel.hotelID);
     var reservations = await _databaseActions.GetReservationsForHotel(hotel.hotelID);
-
-    // Sort rooms based on the selected option
+    
     rooms = sortOption == "price"
         ? rooms.OrderBy(r => r.Price).ToList()
         : rooms.OrderBy(r => r.Size).ToList();
@@ -152,8 +151,7 @@ public class RoomManager
         Console.ReadLine();
         return null;
     }
-
-    // Display table header
+    
     Console.WriteLine($"{"#",-4} {"Room Name",-15} {"Price",-15} {"Size",-10} {"Reservations",-35}");
     Console.WriteLine(new string('-', 80));
 
@@ -189,8 +187,7 @@ public class RoomManager
     }
 
     var selectedRoom = rooms[selectedIndex - 1];
-
-    // Check if the selected room is available for the given dates
+    
     var overlappingReservations = reservations.Where(r =>
         r.RoomId == selectedRoom.RoomId &&
         (startDate < r.EndDate && endDate > r.StartDate)).ToList();
@@ -211,9 +208,8 @@ public class RoomManager
 
     private (DateTime startDate, DateTime endDate) PickDateRange()
 {
-    // Correct date range
     DateTime validStartRange = DateTime.Parse("2024-12-01");
-    DateTime validEndRange = DateTime.Parse("2025-02-28"); // Updated to 28th February
+    DateTime validEndRange = DateTime.Parse("2025-02-28");
 
     DateTime startDate, endDate;
 
@@ -263,8 +259,7 @@ public class RoomManager
             Console.ReadLine();
             continue;
         }
-
-        // Valid range and dates
+        
         break;
     }
 

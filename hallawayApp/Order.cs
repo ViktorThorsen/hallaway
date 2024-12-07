@@ -37,14 +37,12 @@ public class Order
     while (running)
     {
         Console.Clear();
-
-        // Determine status messages
+        
         string partymessage = party._persons.Count >= 1 ? "(Done)" : "(NOT done)";
         string hotelmessage = (hotel != null && hotel.hotelID != null) ? "(Done)" : "(NOT done)";
         string addonsMessage = addonList.Any() ? "(Done)" : "(NOT done)";
         string datemessage = (_reservation.StartDate != DateTime.MinValue && _reservation.EndDate != DateTime.MinValue) ? "(Done)" : "(NOT done)";
-
-        // Main menu
+        
         Console.WriteLine("Menu> OrderMenu");
         Console.WriteLine("---------------------------");
         Console.WriteLine($"1) Manage party {partymessage}");
@@ -66,11 +64,11 @@ public class Order
 
         switch (choice)
         {
-            case 1: // Step 1: Manage Party
+            case 1:
                 await party.PartyMenu();
                 break;
 
-            case 2: // Step 2: Select Destination (Only available if party is managed)
+            case 2:
                 if (party._persons.Count < 1)
                 {
                     Console.WriteLine("You must manage the party before selecting a destination.");
@@ -83,7 +81,7 @@ public class Order
                 }
                 break;
 
-            case 3: // Step 3: Add Addons (Only available if destination is selected)
+            case 3:
                 if (hotel == null || hotel.hotelID == null)
                 {
                     Console.WriteLine("You must select a destination before adding addons.");
@@ -106,7 +104,7 @@ public class Order
                 }
                 break;
 
-            case 4: // Step 4: Set Date (Only available if destination is selected)
+            case 4:
                 if (hotel == null || hotel.hotelID == null)
                 {
                     Console.WriteLine("You must select a destination before selecting room and date.");
@@ -119,11 +117,11 @@ public class Order
                 }
                 break;
 
-            case 5: // View Details
+            case 5:
                 await ShowOrderDetailsMenu();
                 break;
 
-            case 6: // Final Step: Complete Order (Only available if all steps are done)
+            case 6:
                 if (party._persons.Count < 1 || hotel == null || hotel.hotelID == null || _reservation.RoomId == 0)
                 {
                     Console.WriteLine("You must complete all previous steps before finalizing the order.");
@@ -138,11 +136,11 @@ public class Order
                     Console.WriteLine("Order completed successfully!");
                     Console.WriteLine("Press Enter to exit...");
                     Console.ReadLine();
-                    running = false; // Exit the menu
+                    running = false;
                 }
                 break;
 
-            case 0: // Quit
+            case 0:
                 running = false;
                 Console.WriteLine("Goodbye!");
                 break;

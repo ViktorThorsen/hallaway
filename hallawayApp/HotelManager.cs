@@ -76,7 +76,7 @@ public class HotelManager
                     break;
             }
         }
-        return null; // Return null if no hotel is selected
+        return null;
     }
 
    private Hotel ShowHotels()
@@ -89,15 +89,14 @@ public class HotelManager
         (!rating.HasValue || (int)hotel.ratingEnum >= rating.Value) &&
         (!hasPool.HasValue || hotel.pool == hasPool.Value)
     ).ToList();
-
-    // Sort the filtered list based on the selected sort option
+    
     filteredHotels = sortOption switch
     {
         "name" => filteredHotels.OrderBy(h => h.hotelName).ToList(),
         "rating" => filteredHotels.OrderByDescending(h => h.ratingEnum).ToList(),
         "distanceBeach" => filteredHotels.OrderBy(h => h.distanceBeach).ToList(),
         "distanceCityCenter" => filteredHotels.OrderBy(h => h.distanceCityCenter).ToList(),
-        _ => filteredHotels // Default order
+        _ => filteredHotels
     };
 
     if (!filteredHotels.Any())
@@ -105,22 +104,20 @@ public class HotelManager
         Console.WriteLine("No hotels match the current filters.");
         return null;
     }
-
-    // Header
+    
     Console.WriteLine("Hotels:");
     Console.WriteLine(new string('-', 100));
     Console.WriteLine("{0,-5} | {1,-25} | {2,-15} | {3,-15} | {4,-12} | {5,-12} | {6,-5}",
                       "ID", "Name", "City", "Rating", "Beach (m)", "Center (m)", "Pool");
     Console.WriteLine(new string('-', 100));
-
-    // Body
+    
     foreach (var hotel in filteredHotels)
     {
         Console.WriteLine("{0,-5} | {1,-25} | {2,-15} | {3,-15} | {4,-12} | {5,-12} | {6,-5}",
                           hotel.hotelID,
                           hotel.hotelName,
                           hotel.address.City,
-                          hotel.ratingEnum.ToString().Replace("_", " "), // Formatting the rating
+                          hotel.ratingEnum.ToString().Replace("_", " "),
                           hotel.distanceBeach,
                           hotel.distanceCityCenter,
                           hotel.pool ? "Yes" : "No");
