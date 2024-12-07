@@ -33,7 +33,7 @@ public class DatabaseActions
     public async Task<List<Room>> GetRoomsByHotelId(int hotelId)
     {
         var rooms = new List<Room>();
-        const string query = "SELECT room_id, price, size FROM public.room WHERE hotel_id = $1";
+        const string query = "SELECT room_id, room_name, price, size FROM public.room WHERE hotel_id = $1";
 
         await using (var cmd = _db.CreateCommand(query))
         {
@@ -47,6 +47,7 @@ public class DatabaseActions
                     {
                         var room = new Room(
                             roomId: reader.GetInt32(reader.GetOrdinal("room_id")),
+                            roomName: reader.GetString(reader.GetOrdinal("room_name")),
                             price: reader.GetDouble(reader.GetOrdinal("price")),
                             size: reader.GetInt32(reader.GetOrdinal("size"))
                         );
@@ -139,7 +140,7 @@ public class DatabaseActions
     public async Task<List<Room>> GetRooms(int roomID)
     {
         List<Room> rooms = new List<Room>();
-        
+
         await using (var cmd = _db.CreateCommand("SELECT * FROM public.room WHERE room_id = $1"))
         {
             cmd.Parameters.AddWithValue(roomID);
@@ -149,9 +150,10 @@ public class DatabaseActions
                 while (await reader.ReadAsync())
                 {
                     Room room = new Room(
-                        roomId: roomID,
-                        reader.GetDouble(1),
-                        reader.GetInt32(2)
+                        roomId: reader.GetInt32(0),              // room_id
+                        roomName: reader.GetString(4),          // room_name
+                        price: reader.GetDouble(1),             // price
+                        size: reader.GetInt32(2)               // size
                     );
 
                     rooms.Add(room);
@@ -449,6 +451,7 @@ public class DatabaseActions
     
     public async Task<List<Hotel>> GetAllHotels()
 {
+    
     var hotels = new List<Hotel>();
 
     try
@@ -472,7 +475,6 @@ public class DatabaseActions
                     int distancebeach = reader.GetInt32(reader.GetOrdinal("distancebeach"));
                     int distanceCityCenter = reader.GetInt32(reader.GetOrdinal("distancecitycenter"));
                     bool eveningEntertainment = reader.GetBoolean(reader.GetOrdinal("eveningentertainment"));
-                    
                     Address address = await GetAddress(addressId);
                     var rooms = await GetRooms(hotelId);
                     

@@ -2,14 +2,16 @@
 
 public class Room
 {
-    public int RoomId { get; set; } // Unique identifier for the room
-    public double Price { get; set; }
-    public int Size { get; set; }
+    public string room_name;
+    public int RoomId;
+    public double Price;
+    public int Size;
     
 
-    public Room(int roomId, double price, int size)
+    public Room( int roomId, string roomName, double price, int size)
     {
         RoomId = roomId;
+        room_name = roomName;
         Price = price;
         Size = size;
     }

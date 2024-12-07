@@ -124,7 +124,7 @@ public class Order
                 break;
 
             case 6: // Final Step: Complete Order (Only available if all steps are done)
-                if (party._persons.Count < 1 || hotel == null || hotel.hotelID == null || _reservation.RoomId == null)
+                if (party._persons.Count < 1 || hotel == null || hotel.hotelID == null || _reservation.RoomId == 0)
                 {
                     Console.WriteLine("You must complete all previous steps before finalizing the order.");
                     Console.WriteLine("Press Enter to continue...");
