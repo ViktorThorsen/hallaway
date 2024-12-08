@@ -755,7 +755,7 @@ public class DatabaseActions
     public async Task EditPartyByOrder(int orderID)
     {
         const string fetchPartyQuery = @"SELECT party FROM public.order WHERE order_id = $1";
-        const string deletePersonXPartyQuery = @"DELETE FROM public.persons_x_party WHERE party_id = $1 AND person_id = $2";
+        const string deletePersonXPartyQuery = @"DELETE FROM public.person_x_party WHERE party_id = $1 AND person_id = $2";
 
         try
         {

@@ -1,49 +1,210 @@
-1135,17,3,false
-1376,22,12,false
-1223,28,7,false
-1767,16,15,true
-1472,21,9,true
-1589,25,1,true
-1025,18,14,false
-1856,20,8,true
-1210,19,19,true
-1456,24,5,false
-1100,21,10,true
-1320,26,4,false
-1555,27,17,true
-1178,23,2,false
-1680,22,13,true
-1399,25,6,false
-1295,20,11,true
-1490,18,20,false
-1510,29,16,true
-1435,17,18,true
-1600,24,7,false
-1234,22,9,true
-1530,27,3,true
-1440,19,14,false
-1278,21,2,true
-1389,26,10,false
-1365,23,6,true
-1256,28,15,false
-1400,20,8,true
-1505,25,12,true
-1478,22,5,false
-1333,18,1,true
-1489,29,13,true
-1111,21,11,false
-1650,24,18,true
-1300,20,4,false
-1410,26,16,true
-1495,27,19,false
-1560,19,20,true
-1355,28,17,true
-1700,21,9,false
-1287,25,3,true
-1605,18,14,false
-1405,23,7,true
-1750,22,6,true
-1185,19,2,false
-1520,24,12,true
-1375,28,10,false
-1800,20,5,true
+1135,17,3,Standard
+1376,22,12,Deluxe
+1223,28,7,Suite
+1767,16,15,Executive
+1472,21,9,Standard
+1589,25,1,Deluxe
+1025,18,14,Standard
+1856,20,8,Presidential
+1210,19,19,Suite
+1456,24,5,Deluxe
+1100,21,10,Standard
+1320,26,4,Junior Suite
+1555,27,17,Executive
+1178,23,2,Standard
+1680,22,13,Presidential
+1399,25,6,Deluxe
+1295,20,11,Suite
+1490,18,20,Standard
+1510,29,16,Executive
+1435,17,18,Deluxe
+1600,24,7,Suite
+1234,22,9,Standard
+1530,27,3,Junior Suite
+1440,19,14,Standard
+1278,21,2,Deluxe
+1389,26,10,Standard
+1365,23,6,Deluxe
+1256,28,15,Suite
+1400,20,8,Presidential
+1505,25,12,Deluxe
+1478,22,5,Standard
+1333,18,1,Executive
+1489,29,13,Suite
+1111,21,11,Standard
+1650,24,18,Presidential
+1300,20,4,Junior Suite
+1410,26,16,Executive
+1495,27,19,Deluxe
+1560,19,20,Standard
+1355,28,17,Executive
+1700,21,9,Standard
+1287,25,3,Deluxe
+1605,18,14,Standard
+1405,23,7,Deluxe
+1750,22,6,Presidential
+1185,19,2,Standard
+1520,24,12,Deluxe
+1375,28,10,Suite
+1800,20,5,Presidential
+1475,21,8,Deluxe
+1599,29,2,Executive
+1220,26,1,Suite
+1130,24,3,Standard
+1360,18,10,Junior Suite
+1305,25,15,Deluxe
+1420,17,14,Executive
+1270,21,5,Standard
+1500,19,13,Presidential
+1535,29,9,Deluxe
+1340,26,7,Standard
+1450,22,6,Suite
+1380,23,4,Junior Suite
+1415,18,8,Standard
+1250,24,12,Executive
+1550,25,2,Deluxe
+1205,27,19,Suite
+1425,21,20,Presidential
+1330,20,15,Standard
+1495,26,11,Deluxe
+1350,18,13,Executive
+1675,22,10,Presidential
+1325,23,7,Suite
+1445,21,5,Standard
+1575,24,4,Junior Suite
+1300,18,6,Deluxe
+1480,25,14,Executive
+1395,22,9,Standard
+1505,26,8,Presidential
+1410,20,17,Deluxe
+1260,19,15,Suite
+1385,21,16,Standard
+1430,18,12,Junior Suite
+1490,29,14,Deluxe
+1475,24,18,Executive
+1315,26,7,Presidential
+1435,22,19,Standard
+1570,23,10,Deluxe
+1345,17,8,Suite
+1535,18,6,Junior Suite
+1600,25,5,Executive
+1370,21,4,Deluxe
+1495,24,3,Standard
+1225,20,1,Suite
+1520,26,2,Deluxe
+1460,23,10,Executive
+1390,19,12,Standard
+1500,24,13,Junior Suite
+1375,22,14,Deluxe
+1610,27,9,Presidential
+1265,21,15,Standard
+1450,25,8,Executive
+1535,18,7,Deluxe
+1320,22,5,Standard
+1470,20,6,Junior Suite
+1445,26,16,Executive
+1255,23,4,Deluxe
+1590,19,12,Presidential
+1340,24,10,Standard
+1420,25,13,Executive
+1280,21,15,Deluxe
+1530,26,9,Junior Suite
+1305,20,17,Standard
+1465,18,19,Presidential
+1490,22,8,Executive
+1370,23,14,Deluxe
+1575,27,5,Standard
+1455,21,3,Junior Suite
+1310,25,2,Deluxe
+1605,24,12,Standard
+1485,26,7,Presidential
+1375,20,1,Executive
+1445,22,9,Deluxe
+1530,23,10,Standard
+1500,17,14,Suite
+1285,18,19,Presidential
+1435,21,5,Deluxe
+1570,27,3,Executive
+1390,25,11,Junior Suite
+1350,19,2,Standard
+1545,24,13,Deluxe
+1425,22,6,Presidential
+1330,20,8,Standard
+1485,18,7,Executive
+1400,25,4,Junior Suite
+1380,19,11,Standard
+1505,27,2,Deluxe
+1470,23,14,Suite
+1345,24,5,Executive
+1565,20,10,Presidential
+1390,22,3,Standard
+1450,21,13,Deluxe
+1385,19,6,Executive
+1495,25,9,Standard
+1325,18,14,Junior Suite
+1440,24,7,Deluxe
+1475,26,4,Presidential
+1405,23,12,Standard
+1300,27,8,Executive
+1525,22,5,Deluxe
+1360,18,10,Standard
+1480,25,13,Junior Suite
+1430,21,15,Deluxe
+1575,20,6,Executive
+1305,24,9,Standard
+1460,26,11,Presidential
+1400,19,12,Suite
+1540,25,2,Deluxe
+1435,22,14,Executive
+1375,23,10,Standard
+1500,24,3,Deluxe
+1450,21,5,Junior Suite
+1365,18,7,Standard
+1530,20,6,Executive
+1420,25,9,Presidential
+1275,24,13,Deluxe
+1505,23,4,Standard
+1470,26,15,Junior Suite
+1415,19,2,Executive
+1545,25,12,Deluxe
+1390,22,7,Standard
+1510,24,10,Junior Suite
+1445,18,1,Executive
+1335,20,8,Deluxe
+1420,23,14,Presidential
+1300,19,4,Standard
+1465,24,2,Executive
+1395,21,7,Junior Suite
+1515,25,10,Deluxe
+1405,18,6,Standard
+1525,27,5,Executive
+1335,19,11,Junior Suite
+1440,23,9,Deluxe
+1300,25,14,Presidential
+1505,20,6,Standard
+1470,18,7,Executive
+1390,21,12,Junior Suite
+1425,24,13,Deluxe
+1530,26,10,Standard
+1380,19,14,Executive
+1515,22,5,Presidential
+1455,25,1,Deluxe
+1330,20,4,Standard
+1475,24,3,Executive
+1360,19,9,Junior Suite
+1430,21,11,Deluxe
+1400,18,6,Presidential
+1535,25,8,Standard
+1485,22,13,Executive
+1500,23,1,Junior Suite
+1370,19,12,Deluxe
+1435,20,5,Standard
+1395,24,3,Executive
+1490,26,9,Presidential
+1420,21,10,Deluxe
+1540,18,7,Standard
+1455,25,14,Executive
+1335,22,4,Junior Suite
+1410,24,11,Deluxe
+1505,27,6,Presidential
+1400,19,13,Standard
