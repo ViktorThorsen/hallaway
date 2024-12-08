@@ -648,108 +648,159 @@ public class DatabaseActions
             }
         }
     }
+
     public async Task RemoveOrder(int orderID)
-{
-    const string fetchDetailsQuery = @"
-        SELECT reservation_id, party 
-        FROM public.order 
-        WHERE order_id = $1";
-
-    const string deletePersonXPartyQuery = @"
-        DELETE FROM public.person_x_party 
-        WHERE party_id = $1";
-
-    const string deleteAddonsQuery = @"
-        DELETE FROM public.addon_x_order 
-        WHERE order_id = $1";
-
-    const string deleteOrderQuery = @"
-        DELETE FROM public.order 
-        WHERE order_id = $1";
-
-    const string deleteReservationQuery = @"
-        DELETE FROM public.reservation 
-        WHERE id = $1";
-
-    const string deletePartyQuery = @"
-        DELETE FROM public.party 
-        WHERE id = $1";
-
-    await using (var fetchCmd = _db.CreateCommand(fetchDetailsQuery))
     {
-        fetchCmd.Parameters.AddWithValue(orderID);
+        const string fetchDetailsQuery = @"
+            SELECT reservation_id, party 
+            FROM public.order 
+            WHERE order_id = $1";
+
+        const string deletePersonXPartyQuery = @"
+            DELETE FROM public.person_x_party 
+            WHERE party_id = $1";
+
+        const string deleteAddonsQuery = @"
+            DELETE FROM public.addon_x_order 
+            WHERE order_id = $1";
+
+        const string deleteOrderQuery = @"
+            DELETE FROM public.order 
+            WHERE order_id = $1";
+
+        const string deleteReservationQuery = @"
+            DELETE FROM public.reservation 
+            WHERE id = $1";
+
+        const string deletePartyQuery = @"
+            DELETE FROM public.party 
+            WHERE id = $1";
+
+        await using (var fetchCmd = _db.CreateCommand(fetchDetailsQuery))
+        {
+            fetchCmd.Parameters.AddWithValue(orderID);
+
+            try
+            {
+                int? reservationID = null;
+                int? partyID = null;
+
+                // Fetch reservation ID and party ID associated with the order
+                await using (var reader = await fetchCmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        reservationID = reader.IsDBNull(0) ? null : reader.GetInt32(0);
+                        partyID = reader.IsDBNull(1) ? null : reader.GetInt32(1);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order not found.");
+                        return;
+                    }
+                }
+
+                // Delete addons associated with the order
+                await using (var deleteAddonsCmd = _db.CreateCommand(deleteAddonsQuery))
+                {
+                    deleteAddonsCmd.Parameters.AddWithValue(orderID);
+                    await deleteAddonsCmd.ExecuteNonQueryAsync();
+                }
+
+                // Delete the order
+                await using (var deleteOrderCmd = _db.CreateCommand(deleteOrderQuery))
+                {
+                    deleteOrderCmd.Parameters.AddWithValue(orderID);
+                    await deleteOrderCmd.ExecuteNonQueryAsync();
+                }
+
+                // Delete the reservation if it exists
+                if (reservationID.HasValue)
+                {
+                    await using (var deleteReservationCmd = _db.CreateCommand(deleteReservationQuery))
+                    {
+                        deleteReservationCmd.Parameters.AddWithValue(reservationID.Value);
+                        await deleteReservationCmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                // Delete connections between persons and the party
+                if (partyID.HasValue)
+                {
+                    await using (var deletePersonXPartyCmd = _db.CreateCommand(deletePersonXPartyQuery))
+                    {
+                        deletePersonXPartyCmd.Parameters.AddWithValue(partyID.Value);
+                        await deletePersonXPartyCmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                // Delete the party if it exists
+                if (partyID.HasValue)
+                {
+                    await using (var deletePartyCmd = _db.CreateCommand(deletePartyQuery))
+                    {
+                        deletePartyCmd.Parameters.AddWithValue(partyID.Value);
+                        await deletePartyCmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                Console.WriteLine($"Order (ID: {orderID}) and all associated data were removed successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while removing the order: {ex.Message}");
+            }
+        }
+    }
+    public async Task EditPartyByOrder(int orderID)
+    {
+        const string fetchPartyQuery = @"SELECT party FROM public.order WHERE order_id = $1";
+        const string deletePersonXPartyQuery = @"DELETE FROM public.persons_x_party WHERE party_id = $1 AND person_id = $2";
 
         try
         {
-            int? reservationID = null;
-            int? partyID = null;
-
-            // Fetch reservation ID and party ID associated with the order
-            await using (var reader = await fetchCmd.ExecuteReaderAsync())
+            int partyID;
+            await using (var fetchCmd = _db.CreateCommand(fetchPartyQuery))
             {
-                if (await reader.ReadAsync())
+                fetchCmd.Parameters.AddWithValue(orderID);
+
+                await using (var reader = await fetchCmd.ExecuteReaderAsync())
                 {
-                    reservationID = reader.IsDBNull(0) ? null : reader.GetInt32(0);
-                    partyID = reader.IsDBNull(1) ? null : reader.GetInt32(1);
-                }
-                else
-                {
-                    Console.WriteLine("Order not found.");
-                    return;
-                }
-            }
-
-            // Delete addons associated with the order
-            await using (var deleteAddonsCmd = _db.CreateCommand(deleteAddonsQuery))
-            {
-                deleteAddonsCmd.Parameters.AddWithValue(orderID);
-                await deleteAddonsCmd.ExecuteNonQueryAsync();
-            }
-
-            // Delete the order
-            await using (var deleteOrderCmd = _db.CreateCommand(deleteOrderQuery))
-            {
-                deleteOrderCmd.Parameters.AddWithValue(orderID);
-                await deleteOrderCmd.ExecuteNonQueryAsync();
-            }
-
-            // Delete the reservation if it exists
-            if (reservationID.HasValue)
-            {
-                await using (var deleteReservationCmd = _db.CreateCommand(deleteReservationQuery))
-                {
-                    deleteReservationCmd.Parameters.AddWithValue(reservationID.Value);
-                    await deleteReservationCmd.ExecuteNonQueryAsync();
+                    if (await reader.ReadAsync())
+                    {
+                        partyID = reader.GetInt32(reader.GetOrdinal("party"));
+                    }
+                    else
+                    {
+                        throw new Exception("Order not found.");
+                    }
                 }
             }
-
-            // Delete connections between persons and the party
-            if (partyID.HasValue)
+            Console.WriteLine("Enter the person ID to be removed from the party:");
+            if (int.TryParse(Console.ReadLine(), out int personID))
             {
-                await using (var deletePersonXPartyCmd = _db.CreateCommand(deletePersonXPartyQuery))
+                await using (var deleteCmd = _db.CreateCommand(deletePersonXPartyQuery))
                 {
-                    deletePersonXPartyCmd.Parameters.AddWithValue(partyID.Value);
-                    await deletePersonXPartyCmd.ExecuteNonQueryAsync();
+                    deleteCmd.Parameters.AddWithValue(partyID);
+                    deleteCmd.Parameters.AddWithValue(personID);
+                    await deleteCmd.ExecuteNonQueryAsync();
                 }
-            }
 
-            // Delete the party if it exists
-            if (partyID.HasValue)
+                Console.WriteLine($"Person (ID: {personID}) removed from Party (ID: {partyID}) for Order (ID: {orderID}). \nPress Enter to continue...");
+                Console.ReadLine();
+            }
+            else
             {
-                await using (var deletePartyCmd = _db.CreateCommand(deletePartyQuery))
-                {
-                    deletePartyCmd.Parameters.AddWithValue(partyID.Value);
-                    await deletePartyCmd.ExecuteNonQueryAsync();
-                }
+                Console.WriteLine("Invalid person ID. Please enter a valid number.");
+                Console.WriteLine("Press Enter to continue...");
+                Console.ReadLine();
             }
-
-            Console.WriteLine($"Order (ID: {orderID}) and all associated data were removed successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error occurred while removing the order: {ex.Message}");
+            Console.WriteLine($"Error updating party: {ex.Message} \nPress Enter to continue...");
+            Console.ReadLine();
         }
     }
-}
-   
+    
 }

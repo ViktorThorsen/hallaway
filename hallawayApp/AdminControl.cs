@@ -18,7 +18,7 @@ public class AdminControl
             Console.WriteLine(
                 $"Menu> RemoveOrder" +
                 $"\n---------------------------" +
-                $"\n1) Delete Order \n0) Done");
+                $"\n1) Delete Order \n2) Delete Person From Order \n0) Done");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
 
@@ -33,10 +33,10 @@ public class AdminControl
             switch (choice)
             {
                 case 1: 
-                    Console.WriteLine("Please enter an order ID to fetch the reservation ID:");
-                    if (int.TryParse(Console.ReadLine(), out int inputID))
+                    Console.WriteLine("Please enter an order ID to remove order:");
+                    if (int.TryParse(Console.ReadLine(), out int orderID))
                     {
-                        await _databaseActions.RemoveOrder(inputID); 
+                        await _databaseActions.RemoveOrder(orderID); 
                         
 
                         Console.WriteLine("Press Enter to continue...");
@@ -49,7 +49,22 @@ public class AdminControl
                         Console.ReadLine(); 
                     } 
                     break;
+                case 2:
+                    Console.WriteLine("Please enter an order ID to edit party in order:");
+                    if (int.TryParse(Console.ReadLine(), out int order))
+                    {
 
+                        await _databaseActions.EditPartyByOrder(order);
+                        Console.WriteLine("Press Enter to continue...");
+                        Console.ReadLine();
+                    } 
+                    else 
+                    {
+                        Console.WriteLine("Invalid order ID. Please enter a valid number."); 
+                        Console.WriteLine("Press Enter to continue...");
+                        Console.ReadLine(); 
+                    } 
+                    break;
                 case 0:
                     running = false;
                     break;
@@ -62,4 +77,5 @@ public class AdminControl
             }
         }
     }
+    
 }
