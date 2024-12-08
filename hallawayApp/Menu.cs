@@ -50,8 +50,8 @@ public class Menu
                     Console.ReadLine();
                     break;
                 case 4:
-                    AdminControl adminControl = new AdminControl();
-                    adminControl.EditOrderMenu();
+                    AdminControl adminControl = new AdminControl(_databaseActions);
+                    await adminControl.EditOrderMenu();
                     break;
                 case 0:
                     Console.WriteLine("Goodbye!");

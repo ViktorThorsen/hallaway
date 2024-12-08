@@ -3,6 +3,11 @@ namespace hallawayApp;
 public class AdminControl
 {
     private DatabaseActions _databaseActions;
+
+    public AdminControl(DatabaseActions databaseActions)
+    {
+        _databaseActions = databaseActions;
+    }
     public async Task EditOrderMenu()
     {
         bool running = true;
@@ -28,21 +33,27 @@ public class AdminControl
             switch (choice)
             {
                 case 1: 
-                    Console.WriteLine("Please enter an order ID to remove the order:");
+                    Console.WriteLine("Please enter an order ID to fetch the reservation ID:");
                     if (int.TryParse(Console.ReadLine(), out int inputID))
                     {
                         await _databaseActions.RemoveOrder(inputID); 
                         
+
+                        Console.WriteLine("Press Enter to continue...");
+                        Console.ReadLine();
                     } 
                     else 
                     {
                         Console.WriteLine("Invalid order ID. Please enter a valid number."); 
-                        Console.WriteLine("Press Enter to continue..."); Console.ReadLine(); 
+                        Console.WriteLine("Press Enter to continue...");
+                        Console.ReadLine(); 
                     } 
                     break;
+
                 case 0:
                     running = false;
                     break;
+
                 default:
                     Console.WriteLine("Invalid option. Please choose a valid menu option.");
                     Console.WriteLine("Press Enter to continue...");
