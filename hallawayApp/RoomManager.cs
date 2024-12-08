@@ -218,7 +218,7 @@ public class RoomManager
         Console.Clear();
         Console.WriteLine($"Select a date range between {validStartRange:yyyy-MM-dd} and {validEndRange:yyyy-MM-dd}.");
 
-        Console.WriteLine("Enter the start date (yyyy-MM-dd):");
+        Console.WriteLine("Enter the Check-In date (yyyy-MM-dd):");
         if (!DateTime.TryParse(Console.ReadLine(), out startDate))
         {
             Console.WriteLine("Invalid date format. Please try again.");
@@ -235,7 +235,7 @@ public class RoomManager
             continue;
         }
 
-        Console.WriteLine("Enter the end date (yyyy-MM-dd):");
+        Console.WriteLine("Enter the Check-out date (yyyy-MM-dd):");
         if (!DateTime.TryParse(Console.ReadLine(), out endDate))
         {
             Console.WriteLine("Invalid date format. Please try again.");

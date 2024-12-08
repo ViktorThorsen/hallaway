@@ -172,16 +172,18 @@ public class Order
         {
             Console.WriteLine($"{person.name}");
         }
-        Console.WriteLine($"Start Date: {_reservation.StartDate}");
-        Console.WriteLine($"End Date: {_reservation.EndDate}");
+        Console.WriteLine($"Check-in Date: {_reservation.StartDate}");
+        Console.WriteLine($"Check-out Date: {_reservation.EndDate}");
         Console.WriteLine($"Destination: {hotel?.hotelName ?? "No destination selected"}");
         Console.WriteLine("Selected Addons:");
+        Console.WriteLine($"Room: {await _databaseActions.GetRoomName(_reservation.RoomId)}");
+        Console.WriteLine($"Room Price: {await _databaseActions.GetRoomPrice(_reservation.RoomId)} sek");
         foreach (var addon in addonList)
         {
-            Console.WriteLine($"- {addon.name} (${addon.price})");
+            Console.WriteLine($"- {addon.name} ({addon.price} sek)");
         }
 
-        Console.WriteLine("Total price: " + totalPrice);
+        Console.WriteLine("Total price: " + totalPrice + "sek");
 
         Console.WriteLine("\nPress Enter to return...");
         Console.ReadLine();

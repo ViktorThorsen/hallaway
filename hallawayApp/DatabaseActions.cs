@@ -425,6 +425,34 @@ public class DatabaseActions
             }
         }
     }
+    public async Task<string> GetRoomName(int roomId)
+    {
+        await using (var cmd = _db.CreateCommand("SELECT room_name FROM room WHERE room_id = $1"))
+        {
+            cmd.Parameters.AddWithValue(roomId);
+            
+            try
+            {
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return reader.GetString(0);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No matching person found in the database.");
+                        return null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching Person ID: {ex.Message}");
+                throw;
+            }
+        }
+    }
     
     public async Task<int> AddOrder(int partyId, int adminId, int hotelId, double totalPrice, int reservertion_id)
     {
