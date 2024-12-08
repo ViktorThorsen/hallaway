@@ -533,5 +533,34 @@ public class DatabaseActions
                 throw;
             }
         }   
+    }
+    public async Task RemoveOrder(int orderID)
+    {
+        const string query = @"DELETE FROM public.order WHERE order_id = @orderID";
+        await using (var cmd = _db.CreateCommand(query))
+        {
+            cmd.Parameters.AddWithValue("$1", orderID);
+
+            try
+            {
+                int affectedRows = await cmd.ExecuteNonQueryAsync();
+                if (affectedRows > 0)
+                {
+                    Console.WriteLine($"Order removed successfully. Order ID: {orderID} \nPress enter to continue");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    Console.WriteLine("No order was removed. \nPress enter to continue");
+                    Console.ReadLine();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error removing order: {ex.Message} \nPress enter to continue");
+                Console.ReadLine();
+            }
         }
+    }
+
 }
