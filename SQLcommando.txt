@@ -40,13 +40,13 @@ alter table person
 
 create table room
 (
-    room_id      integer generated always as identity
+    room_id   integer generated always as identity
         constraint room_pk
             primary key,
-    price        double precision,
-    size         integer,
-    hotel_id     integer,
-    is_available boolean
+    price     double precision,
+    size      integer,
+    hotel_id  integer,
+    room_name varchar
 );
 
 alter table room
@@ -63,43 +63,6 @@ create table party
 );
 
 alter table party
-    owner to postgres;
-
-create table "order"
-(
-    order_id   integer generated always as identity
-        constraint order_pk
-            primary key,
-    party      integer
-        constraint order_party_id_fk
-            references party,
-    admin      integer
-        constraint order_admin_admin_id_fk
-            references admin,
-    hotel      integer,
-    totalprice double precision,
-    start_date timestamp,
-    end_date   timestamp
-);
-
-alter table "order"
-    owner to postgres;
-
-create table addon
-(
-    addon_id    integer generated always as identity
-        constraint addon_pk
-            primary key,
-    name        varchar,
-    description varchar,
-    price       double precision,
-    hotel       integer,
-    "order"     integer
-        constraint addon_order_id_fk
-            references "order"
-);
-
-alter table addon
     owner to postgres;
 
 create table hotel
@@ -123,19 +86,6 @@ create table hotel
 alter table hotel
     owner to postgres;
 
-create table addon_x_hotel
-(
-    addon_id integer
-        constraint addon_id_fk
-            references addon,
-    hotel_id integer
-        constraint hotel_id_fk
-            references hotel
-);
-
-alter table addon_x_hotel
-    owner to postgres;
-
 create table person_x_party
 (
     person_id integer
@@ -149,3 +99,80 @@ create table person_x_party
 alter table person_x_party
     owner to postgres;
 
+create table reservation
+(
+    id         serial
+        constraint reservation_pk
+            primary key,
+    room_id    integer
+        constraint reservation_room_room_id_fk
+            references room,
+    start_date timestamp,
+    end_date   timestamp
+);
+
+alter table reservation
+    owner to postgres;
+
+create table "order"
+(
+    order_id       integer generated always as identity
+        constraint order_pk
+            primary key,
+    party          integer
+        constraint order_party_id_fk
+            references party,
+    admin          integer
+        constraint order_admin_admin_id_fk
+            references admin,
+    hotel          integer,
+    totalprice     double precision,
+    reservation_id integer
+        constraint order_reservation_id_fk
+            references reservation
+);
+
+alter table "order"
+    owner to postgres;
+
+create table addon
+(
+    addon_id    integer generated always as identity
+        constraint addon_pk
+            primary key,
+    name        varchar,
+    description varchar,
+    price       double precision,
+    "order"     integer
+        constraint addon_order_id_fk
+            references "order"
+);
+
+alter table addon
+    owner to postgres;
+
+create table addon_x_hotel
+(
+    addon_id integer
+        constraint addon_id_fk
+            references addon,
+    hotel_id integer
+        constraint hotel_id_fk
+            references hotel
+);
+
+alter table addon_x_hotel
+    owner to postgres;
+
+create table addon_x_order
+(
+    addon_id integer
+        constraint addon_x_order_addon_addon_id_fk
+            references addon,
+    order_id integer
+        constraint addon_x_order_order_order_id_fk
+            references "order"
+);
+
+alter table addon_x_order
+    owner to postgres;
