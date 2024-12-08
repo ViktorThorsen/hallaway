@@ -119,7 +119,9 @@ public class Order
                 else
                 {
                     _reservation = await _roomManager.RoomMenu(hotel);
-                    AddToTotal(await _databaseActions.GetRoomPrice(_reservation.RoomId));
+                    TimeSpan days = _reservation.EndDate - _reservation.StartDate;
+                    double price = await _databaseActions.GetRoomPrice(_reservation.RoomId);
+                    AddToTotal(price * days.Days);
                 }
                 break;
 
@@ -178,6 +180,7 @@ public class Order
         {
             Console.WriteLine($"- {addon.name} (${addon.price})");
         }
+
         Console.WriteLine("Total price: " + totalPrice);
 
         Console.WriteLine("\nPress Enter to return...");
