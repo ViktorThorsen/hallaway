@@ -638,24 +638,49 @@ public class DatabaseActions
     }
     public async Task RemoveOrder(int orderID)
     {
-        const string query = @"DELETE FROM public.order WHERE order_id = @orderID";
-        await using (var cmd = _db.CreateCommand(query))
+        const string fetchRpId = @"SELECT reservation_id, party FROM public.order WHERE order_id = $1";
+        const string deleteOrder = @"DELETE FROM public.order WHERE order_id = $1";
+        const string deleteReservation = @"DELETE FROM reservation WHERE id = $2";
+        const string deleteParty = @"DELETE FROM public.party WHERE id = $3";
+        
+        await using (var cmd = _db.CreateCommand(fetchRpId))
         {
-            cmd.Parameters.AddWithValue("$1", orderID);
-
+            cmd.Parameters.AddWithValue(orderID);
             try
             {
-                int affectedRows = await cmd.ExecuteNonQueryAsync();
-                if (affectedRows > 0)
+                int reservationID;
+                int partyID;
+
+                await using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    Console.WriteLine($"Order removed successfully. Order ID: {orderID} \nPress enter to continue");
-                    Console.ReadLine();
+                    if (await reader.ReadAsync())
+                    {
+                        reservationID = reader.GetInt32(reader.GetOrdinal("reservation_id"));
+                        partyID = reader.GetInt32(reader.GetOrdinal("party"));
+                    }
+                    else
+                    {
+                        throw new Exception("Order not found");
+                    }
                 }
-                else
+
+                await using (var deleteOrderCmd = _db.CreateCommand(deleteOrder))
                 {
-                    Console.WriteLine("No order was removed. \nPress enter to continue");
-                    Console.ReadLine();
+                    deleteOrderCmd.Parameters.AddWithValue(orderID);
+                    await deleteOrderCmd.ExecuteNonQueryAsync();
                 }
+                await using (var deleteReservationCmd = _db.CreateCommand(deleteReservation))
+                {
+                    deleteReservationCmd.Parameters.AddWithValue(reservationID);
+                    await deleteReservationCmd.ExecuteNonQueryAsync();
+                }
+                await using (var deletePartyCmd = _db.CreateCommand(deleteParty))
+                {
+                    deletePartyCmd.Parameters.AddWithValue(partyID);
+                    await deletePartyCmd.ExecuteNonQueryAsync();
+                }
+                Console.WriteLine($"Order removed successfully. Order ID: {orderID} \nPress enter to continue");
+                Console.ReadLine();
             }
             catch (Exception ex)
             {
@@ -664,5 +689,4 @@ public class DatabaseActions
             }
         }
     }
-
 }

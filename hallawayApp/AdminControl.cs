@@ -27,10 +27,18 @@ public class AdminControl
 
             switch (choice)
             {
-                case 1:
-                    Console.WriteLine("Please enter a orderID to remove order");
-                    int inputID = Int32.Parse(Console.ReadLine());
-                    await _databaseActions.RemoveOrder(inputID);
+                case 1: 
+                    Console.WriteLine("Please enter an order ID to remove the order:");
+                    if (int.TryParse(Console.ReadLine(), out int inputID))
+                    {
+                        await _databaseActions.RemoveOrder(inputID); 
+                        
+                    } 
+                    else 
+                    {
+                        Console.WriteLine("Invalid order ID. Please enter a valid number."); 
+                        Console.WriteLine("Press Enter to continue..."); Console.ReadLine(); 
+                    } 
                     break;
                 case 0:
                     running = false;
