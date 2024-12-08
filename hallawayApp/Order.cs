@@ -14,7 +14,7 @@ public class Order
     private DatePicker _datePicker;
     private DateTime start_date;
     private DateTime end_date;
-    private double totalPrice = 100;
+    private double totalPrice = 0;
 
     private DatabaseActions _databaseActions;
 
@@ -102,6 +102,11 @@ public class Order
                                 addonList.Add(addon);
                             }
                         }
+                    }
+
+                    foreach (var addon in addonList)
+                    {
+                        totalPrice += addon.price;
                     }
                 }
                 break;
