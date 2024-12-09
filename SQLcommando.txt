@@ -142,10 +142,7 @@ create table addon
             primary key,
     name        varchar,
     description varchar,
-    price       double precision,
-    "order"     integer
-        constraint addon_order_id_fk
-            references "order"
+    price       double precision
 );
 
 alter table addon
