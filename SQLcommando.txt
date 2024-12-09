@@ -101,7 +101,7 @@ alter table person_x_party
 
 create table reservation
 (
-    id         serial
+    id    integer generated always as identity
         constraint reservation_pk
             primary key,
     room_id    integer
