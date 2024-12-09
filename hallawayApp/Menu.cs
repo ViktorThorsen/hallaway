@@ -22,7 +22,7 @@ public class Menu
             Console.WriteLine(
                 $"Menu" +
                 $"\n--------------------" +
-                $"\n1) Create new Order \n2) Edit Registered Persons \n3) Edit Hotels \n0) Quit");
+                $"\n1) Create new Order \n2) Edit Registered Persons \n3) Edit Hotels \n4) Edit Order\n0) Quit");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
             if (!int.TryParse(input, out int choice))
@@ -48,6 +48,10 @@ public class Menu
                     Console.WriteLine("Edit Hotels - Feature coming soon!");
                     Console.WriteLine("Press Enter to continue...");
                     Console.ReadLine();
+                    break;
+                case 4:
+                    AdminControl adminControl = new AdminControl(_databaseActions);
+                    await adminControl.EditOrderMenu();
                     break;
                 case 0:
                     Console.WriteLine("Goodbye!");

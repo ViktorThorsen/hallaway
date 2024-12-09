@@ -2,14 +2,17 @@
 
 public class Room
 {
-    public double _price;
-    public int _size;
-    public bool _isAvailable;
- 
-    public Room(double price, int size, bool isAvailable)
+    public string room_name;
+    public int RoomId;
+    public double Price;
+    public int Size;
+    
+
+    public Room( int roomId, string roomName, double price, int size)
     {
-        this._price = price;
-        this._size = size;
-        this._isAvailable = isAvailable;
+        RoomId = roomId;
+        room_name = roomName;
+        Price = price;
+        Size = size;
     }
 }
