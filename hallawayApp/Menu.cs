@@ -22,7 +22,7 @@ public class Menu
             Console.WriteLine(
                 $"Menu" +
                 $"\n--------------------" +
-                $"\n1) Create new Order \n2) Edit Registered Persons \n3) Edit Hotels \n4) Edit Order\n0) Quit");
+                $"\n1) Create new Order \n2) Edit Orders\n0) Quit");
             Console.WriteLine("\nEnter your choice: ");
             string input = Console.ReadLine();
             if (!int.TryParse(input, out int choice))
@@ -40,22 +40,12 @@ public class Menu
                     await order.CreateOrder(adminId);
                     break;
                 case 2:
-                    Console.WriteLine("Edit Registered Persons - Feature coming soon!");
-                    Console.WriteLine("Press Enter to continue...");
-                    Console.ReadLine();
-                    break;
-                case 3:
-                    Console.WriteLine("Edit Hotels - Feature coming soon!");
-                    Console.WriteLine("Press Enter to continue...");
-                    Console.ReadLine();
-                    break;
-                case 4:
                     AdminControl adminControl = new AdminControl(_databaseActions);
                     await adminControl.EditOrderMenu();
                     break;
                 case 0:
                     Console.WriteLine("Goodbye!");
-                    running = false; // Exit the loop
+                    running = false;
                     break;
                 default:
                     Console.WriteLine("Invalid choice. Please select a valid menu option.");
@@ -76,7 +66,7 @@ public class Menu
             string firstColumn = $"{i + 1}) {admins[i].name}";
             string secondColumn = (i + halfCount < admins.Count)
                 ? $"{i + 1 + halfCount}) {admins[i + halfCount].name}"
-                : ""; // Handle the case when the number of persons is odd
+                : "";
             Console.WriteLine($"{firstColumn,-30} {secondColumn}");
 
         }
@@ -97,7 +87,7 @@ public class Menu
             if (choice == 0)
             {
                 Console.WriteLine("Selection canceled.");
-                return 0; // Exit function on cancel
+                return 0;
             }
 
             if (choice < 1 || choice > admins.Count)
@@ -106,14 +96,11 @@ public class Menu
                     $"Invalid choice. Please select a number between 1 and {admins.Count}, or 0 to cancel.");
                 continue;
             }
-
-            // Calculate the corresponding user_id
-            int adminId = choice; // Since the list is ordered by user_id and 1-based indexing is used
             Admin selectedAdmin = admins[choice - 1];
 
             Console.WriteLine($"You selected: {selectedAdmin.name}");
             return choice;
-            break; // Exit the loop after a valid choice
+            break;
 
         }
     }

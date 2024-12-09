@@ -738,8 +738,7 @@ public class DatabaseActions
             {
                 int? reservationID = null;
                 int? partyID = null;
-
-                // Fetch reservation ID and party ID associated with the order
+                
                 await using (var reader = await fetchCmd.ExecuteReaderAsync())
                 {
                     if (await reader.ReadAsync())
@@ -753,22 +752,19 @@ public class DatabaseActions
                         return;
                     }
                 }
-
-                // Delete addons associated with the order
+                
                 await using (var deleteAddonsCmd = _db.CreateCommand(deleteAddonsQuery))
                 {
                     deleteAddonsCmd.Parameters.AddWithValue(orderID);
                     await deleteAddonsCmd.ExecuteNonQueryAsync();
                 }
-
-                // Delete the order
+                
                 await using (var deleteOrderCmd = _db.CreateCommand(deleteOrderQuery))
                 {
                     deleteOrderCmd.Parameters.AddWithValue(orderID);
                     await deleteOrderCmd.ExecuteNonQueryAsync();
                 }
-
-                // Delete the reservation if it exists
+                
                 if (reservationID.HasValue)
                 {
                     await using (var deleteReservationCmd = _db.CreateCommand(deleteReservationQuery))
@@ -777,8 +773,7 @@ public class DatabaseActions
                         await deleteReservationCmd.ExecuteNonQueryAsync();
                     }
                 }
-
-                // Delete connections between persons and the party
+                
                 if (partyID.HasValue)
                 {
                     await using (var deletePersonXPartyCmd = _db.CreateCommand(deletePersonXPartyQuery))
@@ -787,8 +782,7 @@ public class DatabaseActions
                         await deletePersonXPartyCmd.ExecuteNonQueryAsync();
                     }
                 }
-
-                // Delete the party if it exists
+                
                 if (partyID.HasValue)
                 {
                     await using (var deletePartyCmd = _db.CreateCommand(deletePartyQuery))

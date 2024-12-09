@@ -415,12 +415,12 @@ public class Party
             $"Menu> OrderMenu> PartyMenu> Add{message}" +                   
             $"\n---------------------------" +               
             $"\nEnter Date of Birth (e.g., 2000-12-31) of the {message}: "); 
-        while (true) // Loop until the user enters a valid date
+        while (true)
         {
             string input = Console.ReadLine();
             if (DateTime.TryParse(input, out DateTime dateOfBirth))
             {
-                return dateOfBirth; // Return the valid date
+                return dateOfBirth;
             }
             else
             {
