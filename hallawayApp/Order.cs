@@ -29,7 +29,6 @@ public class Order
     _roomManager = new RoomManager(_databaseActions);
     _addonManager = new AddonManager(_databaseActions);
     addonList = new List<Addon>();
-    _reservation = new Reservation();
     admin_id = admin;
 
     bool running = true;
@@ -41,7 +40,7 @@ public class Order
         string partymessage = party._persons.Count >= 1 ? "(Done)" : "(NOT done)";
         string hotelmessage = (hotel != null && hotel.hotelID != null) ? "(Done)" : "(NOT done)";
         string addonsMessage = addonList.Any() ? "(Done)" : "(NOT done)";
-        string datemessage = (_reservation.StartDate != DateTime.MinValue && _reservation.EndDate != DateTime.MinValue) ? "(Done)" : "(NOT done)";
+        string datemessage = (_reservation != null) ? "(Done)" : "(NOT done)";
         
         Console.WriteLine("Menu> OrderMenu");
         Console.WriteLine("---------------------------");
@@ -119,10 +118,12 @@ public class Order
                 else
                 {
                     _reservation = await _roomManager.RoomMenu(hotel);
-                    TimeSpan days = _reservation.EndDate - _reservation.StartDate;
-                    double price = await _databaseActions.GetRoomPrice(_reservation.RoomId);
-                    AddToTotal(price * days.Days);
-                }
+                    if (_reservation != null)
+                    {
+                        TimeSpan days = _reservation.EndDate - _reservation.StartDate;
+                        double price = await _databaseActions.GetRoomPrice(_reservation.RoomId);
+                        AddToTotal(price * days.Days);
+                    }}
                 break;
 
             case 5:
