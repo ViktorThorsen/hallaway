@@ -1,4 +1,7 @@
 Made by: Daniel, Sandra, Viktor and Celvin
+
+link to GitHub: https://github.com/ViktorThorsen/hallaway
+
 To set up the database properly, you can import mockdata from the files present in the hallaway folder in the following order:
 SQLcommando.txt (run the script in sql)
 addon.csv
