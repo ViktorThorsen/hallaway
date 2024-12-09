@@ -1,17 +1,20 @@
-﻿namespace hallawayApp;
+﻿﻿namespace hallawayApp;
+
 using System.Diagnostics;
+
 public class Order
 {
     private string orderName;
     private Party party;
     private HotelManager _hotelManager;
-    private Admin admin;
+    private int admin_id;
     private Hotel hotel;
-    private DatePicker _datePicker;
-    private DateTime start_date;
-    private DateTime end_date;
-    private double totalPrice;
+    private Reservation _reservation;
+    private AddonManager _addonManager;
     private List<Addon> addonList;
+    private RoomManager _roomManager;
+    private double totalPrice = 0;
+
     private DatabaseActions _databaseActions;
 
     public Order(DatabaseActions databaseActions)
@@ -20,121 +23,174 @@ public class Order
     }
 
     public async Task CreateOrder(int admin)
+{
+    party = new Party(_databaseActions);
+    _hotelManager = new HotelManager(_databaseActions);
+    _roomManager = new RoomManager(_databaseActions);
+    _addonManager = new AddonManager(_databaseActions);
+    addonList = new List<Addon>();
+    _reservation = new Reservation();
+    admin_id = admin;
+
+    bool running = true;
+
+    while (running)
     {
-        party = new Party(_databaseActions);
-        _hotelManager = new HotelManager(_databaseActions);
-        _datePicker = new DatePicker();
-        bool running = true;
+        Console.Clear();
+        
+        string partymessage = party._persons.Count >= 1 ? "(Done)" : "(NOT done)";
+        string hotelmessage = (hotel != null && hotel.hotelID != null) ? "(Done)" : "(NOT done)";
+        string addonsMessage = addonList.Any() ? "(Done)" : "(NOT done)";
+        string datemessage = (_reservation.StartDate != DateTime.MinValue && _reservation.EndDate != DateTime.MinValue) ? "(Done)" : "(NOT done)";
+        
+        Console.WriteLine("Menu> OrderMenu");
+        Console.WriteLine("---------------------------");
+        Console.WriteLine($"1) Manage party {partymessage}");
+        Console.WriteLine($"2) Select destination {hotelmessage}");
+        Console.WriteLine($"3) Add Extra Addons {addonsMessage}");
+        Console.WriteLine($"4) Select Room And Date {datemessage}");
+        Console.WriteLine($"5) View details");
+        Console.WriteLine($"6) Done");
+        Console.WriteLine($"0) Quit");
 
-        while (running){ 
-            Console.Clear();
-        Console.WriteLine(
-                          $"Menu> OrderMenu" +
-                          $"\n---------------------------" + 
-                          $"\n1) Manage party " +
-                          $"\n2) Set date " +
-                          $"\n3) Select destination " +
-                          $"\n33) Addons " +
-                          $"\n4) View details " +
-                          $"\n5) Done " +
-                          $"\n0) Quit");
         Console.WriteLine("\nEnter your choice: ");
-        int input = Int32.Parse(Console.ReadLine());
-        Debug.Assert(input != null);
+        if (!int.TryParse(Console.ReadLine(), out int choice))
+        {
+            Console.WriteLine("Invalid input. Please enter a number between 0 and 6.");
+            Console.WriteLine("Press Enter to continue...");
+            Console.ReadLine();
+            continue;
+        }
 
-        switch (input)
+        switch (choice)
         {
             case 1:
                 await party.PartyMenu();
                 break;
+
             case 2:
-                var (startDate, endDate) = _datePicker.PickDateRange();
-                start_date = startDate;
-                end_date = endDate;
+                if (party._persons.Count < 1)
+                {
+                    Console.WriteLine("You must manage the party before selecting a destination.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    hotel = await _hotelManager.FindHotelMenu();
+                }
                 break;
+
             case 3:
-                await _hotelManager.FindHotelMenu();
+                if (hotel == null || hotel.hotelID == null)
+                {
+                    Console.WriteLine("You must select a destination before adding addons.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    var newAddons = await _addonManager.FindAddonMenu(hotel.hotelID, addonList);
+                    if (newAddons != null && newAddons.Any())
+                    {
+                        foreach (var addon in newAddons)
+                        {
+                            if (!addonList.Contains(addon))
+                            {
+                                addonList.Add(addon);
+                            }
+                        }
+                    }
+
+                    foreach (var addon in addonList)
+                    {
+                       totalPrice = AddToTotal(addon.price);
+                    }
+                }
                 break;
-            case 33:
-            
-            
-            
+
             case 4:
-                ShowOrderDetailsMenu();
+                if (hotel == null || hotel.hotelID == null)
+                {
+                    Console.WriteLine("You must select a destination before selecting room and date.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    _reservation = await _roomManager.RoomMenu(hotel);
+                    TimeSpan days = _reservation.EndDate - _reservation.StartDate;
+                    double price = await _databaseActions.GetRoomPrice(_reservation.RoomId);
+                    AddToTotal(price * days.Days);
+                }
                 break;
+
             case 5:
-                _databaseActions.AddOrder(party.partyID, admin, hotel, start_date, end_date, totalPrice);
-                running = false;
+                await ShowOrderDetailsMenu();
                 break;
+
+            case 6:
+                if (party._persons.Count < 1 || hotel == null || hotel.hotelID == null || _reservation.RoomId == 0)
+                {
+                    Console.WriteLine("You must complete all previous steps before finalizing the order.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    int reservation_id = await _databaseActions.AddReservation(_reservation);
+                    int orderID = await _databaseActions.AddOrder(party.partyID, admin_id, hotel.hotelID, totalPrice, reservation_id);
+                    await _databaseActions.AddtoAddonXOrder(addonList, orderID);
+                    Console.WriteLine("Order completed successfully!");
+                    Console.WriteLine("Press Enter to exit...");
+                    Console.ReadLine();
+                    running = false;
+                }
+                break;
+
             case 0:
                 running = false;
-                Console.WriteLine("Goodbye!"); // Quit!
+                Console.WriteLine("Goodbye!");
                 break;
+
             default:
+                Console.WriteLine("Invalid option. Please choose a valid menu option.");
+                Console.WriteLine("Press Enter to continue...");
+                Console.ReadLine();
                 break;
-        }}
+        }
     }
+}
 
     public async Task ShowOrderDetailsMenu()
     {
-        bool viewingDetails = true;
-
-        while (viewingDetails)
+        Console.Clear();
+        Console.WriteLine("Menu> OrderMenu");
+        Console.WriteLine("---------------------------");
+        Console.WriteLine("Persons in Party:");
+        foreach (Person person in party._persons)
         {
-            Console.Clear();
-            Console.WriteLine($"Menu> OrderMenu \n---------------------------");
-            Console.WriteLine($"Persons in Party: ");
-            foreach (Person person in party._persons)
-            {
-                Console.WriteLine($"{person.name}");
-            }
-            Console.WriteLine($"Start Date: {start_date}");
-            Console.WriteLine($"Start Date: {end_date}");
-            Console.WriteLine($"Destination: ");
-            Console.WriteLine("\n0) Back");
-
-            Console.WriteLine("\nEnter 0 to back: ");
-            string input = Console.ReadLine();
-
-            if (input == "0")
-            {
-                viewingDetails = false; // Exit the details menu
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter '0' to go back.");
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-            }
+            Console.WriteLine($"{person.name}");
         }
+        Console.WriteLine($"Check-in Date: {_reservation.StartDate}");
+        Console.WriteLine($"Check-out Date: {_reservation.EndDate}");
+        Console.WriteLine($"Destination: {hotel?.hotelName ?? "No destination selected"}");
+        Console.WriteLine("Selected Addons:");
+        Console.WriteLine($"Room: {await _databaseActions.GetRoomName(_reservation.RoomId)}");
+        Console.WriteLine($"Room Price: {await _databaseActions.GetRoomPrice(_reservation.RoomId)} sek");
+        foreach (var addon in addonList)
+        {
+            Console.WriteLine($"- {addon.name} ({addon.price} sek)");
+        }
+
+        Console.WriteLine("Total price: " + totalPrice + "sek");
+
+        Console.WriteLine("\nPress Enter to return...");
+        Console.ReadLine();
     }
-    //  Method that produces a list of hotels
-    /*
-    public void ShowAllHotels()
+    public double AddToTotal(double price)
     {
-        // Get list of hotels from the database
-        List<Hotel> hotelList = new List<Hotel>();
-
-        // Checking if the list hotelList is empty
-        if (hotelList.Count == 0) 
-        {
-            // If no hotels are found
-            Console.WriteLine("No hotels available.");
-        }
-        else
-        {
-            // Showing available hotels
-            Console.WriteLine("Available hotels:");
-            foreach (var hotel in hotelList)
-            {
-                // Showing hotel details 
-                Console.WriteLine($"Name: {hotel.hotelName},Address: {hotel.address}," +
-                                  $"Pool: {hotel.pool}," +
-                                  $"KidsClub: {hotel.kidsClub}, Distance to beach: {hotel.distanceBeach}" +
-                                  $"Distance to city: {hotel.distanceCityCenter}," +
-                                  $"Evening entertainment: {hotel.eveningEntertainment}");
-            }
-        }
-        Console.WriteLine();
-    }*/
+        double newPrice = totalPrice += price;
+        return newPrice;
+    }
 }

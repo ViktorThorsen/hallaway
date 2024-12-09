@@ -1,4 +1,4 @@
-create table if not exists "address"
+create table address
 (
     location_id integer generated always as identity
         constraint address_pk
@@ -7,10 +7,10 @@ create table if not exists "address"
     street      varchar
 );
 
-alter table "address"
+alter table address
     owner to postgres;
 
-create table if not exists admin
+create table admin
 (
     admin_id      integer generated always as identity
         constraint admin_pk
@@ -24,7 +24,7 @@ create table if not exists admin
 alter table admin
     owner to postgres;
 
-create table if not exists "person"
+create table person
 (
     user_id       integer generated always as identity
         constraint person_pk
@@ -35,56 +35,107 @@ create table if not exists "person"
     date_of_birth date
 );
 
-alter table "person"
+alter table person
     owner to postgres;
 
-create table if not exists "room"
+create table room
 (
-    room_id      integer generated always as identity
+    room_id   integer generated always as identity
         constraint room_pk
             primary key,
-    price        double precision,
-    size         integer,
-    hotel_id     integer,
-    is_available boolean
+    price     double precision,
+    size      integer,
+    hotel_id  integer,
+    room_name varchar
 );
 
-alter table "room"
+alter table room
     owner to postgres;
 
-create table if not exists "party"
+create table party
 (
     id           integer generated always as identity
         constraint id
             primary key,
     organizer_id integer
         constraint organizer
-            references "person"
+            references person
 );
 
-alter table "party"
+alter table party
     owner to postgres;
 
-create table if not exists "order"
+create table hotel
 (
-    order_id   integer generated always as identity
+    hotel_id             integer generated always as identity
+        constraint hotel_pk
+            primary key,
+    hotel_name           varchar,
+    address              integer
+        constraint hotel_address_location_id_fk
+            references address,
+    pool                 boolean,
+    resturant            boolean,
+    kidsclub             boolean,
+    rating               integer,
+    distancebeach        integer,
+    distancecitycenter   integer,
+    eveningentertainment boolean
+);
+
+alter table hotel
+    owner to postgres;
+
+create table person_x_party
+(
+    person_id integer
+        constraint person_person_part_id_fk
+            references person,
+    party_id  integer
+        constraint party_party_id_fk
+            references party
+);
+
+alter table person_x_party
+    owner to postgres;
+
+create table reservation
+(
+    id         serial
+        constraint reservation_pk
+            primary key,
+    room_id    integer
+        constraint reservation_room_room_id_fk
+            references room,
+    start_date timestamp,
+    end_date   timestamp
+);
+
+alter table reservation
+    owner to postgres;
+
+create table "order"
+(
+    order_id       integer generated always as identity
         constraint order_pk
             primary key,
-    party      integer
+    party          integer
         constraint order_party_id_fk
-            references "party",
-    admin      integer
+            references party,
+    admin          integer
         constraint order_admin_admin_id_fk
             references admin,
-    hotel      integer,
-    date       date,
-    totalprice double precision
+    hotel          integer,
+    totalprice     double precision,
+    reservation_id integer
+        constraint order_reservation_id_fk
+            references reservation
 );
 
 alter table "order"
     owner to postgres;
 
-create table if not exists "addon"
+create table addon
 (
     addon_id    integer generated always as identity
         constraint addon_pk
@@ -92,58 +143,36 @@ create table if not exists "addon"
     name        varchar,
     description varchar,
     price       double precision,
-    hotel       integer,
     "order"     integer
         constraint addon_order_id_fk
             references "order"
 );
 
-alter table "addon"
+alter table addon
     owner to postgres;
 
-create table if not exists "hotel"
-(
-    hotel_id            integer generated always as identity
-        constraint hotel_pk
-            primary key,
-    hotel_name          varchar,
-    address             integer
-        constraint hotel_address_location_id_fk
-            references "address",
-    pool                boolean,
-    resturant           boolean,
-    kidsclub            boolean,
-    rating              integer,
-    distancebeach       integer,
-    distancecitycenter  integer,
-    eveningentertainment boolean
-);
-
-alter table "hotel"
-    owner to postgres;
-
-create table if not exists "addon_x_hotel"
+create table addon_x_hotel
 (
     addon_id integer
         constraint addon_id_fk
-            references "addon",
+            references addon,
     hotel_id integer
         constraint hotel_id_fk
-            references "hotel"
+            references hotel
 );
 
-alter table "addon_x_hotel"
+alter table addon_x_hotel
     owner to postgres;
 
-create table if not exists "person_x_party"
+create table addon_x_order
 (
-    person_id integer
-        constraint person_person_part_id_fk
-            references "person",
-    party_id  integer
-        constraint party_party_id_fk
-            references "party"
+    addon_id integer
+        constraint addon_x_order_addon_addon_id_fk
+            references addon,
+    order_id integer
+        constraint addon_x_order_order_order_id_fk
+            references "order"
 );
 
-alter table "person_x_party"
+alter table addon_x_order
     owner to postgres;

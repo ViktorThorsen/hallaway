@@ -14,33 +14,55 @@ public class Menu
 
     public async Task ShowMainMenu(int adminId)
     {
-        Console.Clear();
-        Console.WriteLine(
-            $"Menu" +
-            $"\n--------------------" +
-            $"\n1) Create new Order \n2)" +
-            $" Edit Registered Persons \n3) Edit Hotels \n0 Quit");
-        Console.WriteLine("\nEnter your choice: ");
-        int input = Int32.Parse(Console.ReadLine());
-        Debug.Assert(input != null);
+        bool running = true;
 
-        switch (input)
+        while (running)
         {
-            case 1:
-                Order order = new Order(_databaseActions);
-                await order.CreateOrder(adminId);
-                break;
-            case 2:
-                
-                break;
-            case 3:
-                
-                break;
-            case 0:
-                Console.WriteLine("Goodbye!"); // Quit!
-                break;
-            default:
-                break;
+            Console.Clear();
+            Console.WriteLine(
+                $"Menu" +
+                $"\n--------------------" +
+                $"\n1) Create new Order \n2) Edit Registered Persons \n3) Edit Hotels \n4) Edit Order\n0) Quit");
+            Console.WriteLine("\nEnter your choice: ");
+            string input = Console.ReadLine();
+            if (!int.TryParse(input, out int choice))
+            {
+                Console.WriteLine("Invalid input. Please enter a number between 0 and 3.");
+                Console.WriteLine("Press Enter to continue...");
+                Console.ReadLine();
+                continue;
+            }
+
+            switch (choice)
+            {
+                case 1:
+                    Order order = new Order(_databaseActions);
+                    await order.CreateOrder(adminId);
+                    break;
+                case 2:
+                    Console.WriteLine("Edit Registered Persons - Feature coming soon!");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                    break;
+                case 3:
+                    Console.WriteLine("Edit Hotels - Feature coming soon!");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                    break;
+                case 4:
+                    AdminControl adminControl = new AdminControl(_databaseActions);
+                    await adminControl.EditOrderMenu();
+                    break;
+                case 0:
+                    Console.WriteLine("Goodbye!");
+                    running = false; // Exit the loop
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. Please select a valid menu option.");
+                    Console.WriteLine("Press Enter to continue...");
+                    Console.ReadLine();
+                    break;
+            }
         }
     }
 
